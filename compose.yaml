@@ -1,7 +1,8 @@
 services:
   wa-webhook:
-    container_name: wa-webhook
     image: canicaperu/wa-webhook-app
+    container_name: wa-webhook
+    restart: unless-stopped
     ports:
       - "${WA_WEBHOOK_PORT}:5000"
     volumes:
@@ -14,7 +15,7 @@ services:
   wa-webhook-db:
     image: postgres:14-alpine
     container_name: wa-webhook-db
-    restart: always
+    restart: unless-stopped
     expose:
       - 5432:5432
     environment:
