@@ -1,7 +1,7 @@
 services:
   app:
     container_name: wa-webhook
-    image: canicaperu/wa-webhook-app
+    build: .
     ports:
       - "${WA_WEBHOOK_PORT}:5000"
     volumes:

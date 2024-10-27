@@ -4,7 +4,8 @@ Integrate WhatsApp messaging capabilities into your applications through webhook
 REST APIs.
 
 > [!IMPORTANT]
-> **Uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js), so it's not guaranteed you won't be blocked by using this method. WhatsApp does
+> **Uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js), so it's not guaranteed you won't be blocked
+by using this method. WhatsApp does
 not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.**
 
 ## 🚀 Features
@@ -90,6 +91,12 @@ Remove a specific webhook by ID.
 ```bash
 npm install
 npm start
+```
+
+- Build and run with Docker:
+
+```bash
+docker compose -f compose.build.yaml up -d
 ```
 
 - Run with Docker:
