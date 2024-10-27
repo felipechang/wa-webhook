@@ -1,11 +1,15 @@
-# WhatsApp Webhooks Integration
+# WhatsApp Webhooks
 
-A robust and flexible system for integrating WhatsApp messaging capabilities into your applications through webhooks and
+Integrate WhatsApp messaging capabilities into your applications through webhooks and
 REST APIs.
+
+> [!IMPORTANT]
+> **Uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js), so it's not guaranteed you won't be blocked by using this method. WhatsApp does
+not allow bots or unofficial clients on their platform, so this shouldn't be considered totally safe.**
 
 ## 🚀 Features
 
-- **WhatsApp Client Integration**: Seamless UI connection to WhatsApp client
+- **WhatsApp Client**: Seamless UI connection to WhatsApp client
 - **Real-time Status**: Monitor WhatsApp client connection status
 - **Webhook Management**: Register and manage webhook callbacks for WhatsApp events
 - **Message Handling**: Send and receive WhatsApp messages programmatically
