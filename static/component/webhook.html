@@ -1,0 +1,57 @@
+<div class="flex flex-row mb-10">
+    <div class="text-3xl mx-auto">Manage Webhooks</div>
+</div>
+<div class="flex flex-row">
+    <div class="basis-1/3 flex flex-col items-center">
+        <h1 class="text-3xl">Create:</h1>
+        <form class="flex flex-col gap-2 items-end" hx-post="/component/webhook-control" hx-target="#webhook-response"
+              hx-validate>
+            <label class="form-control w-full max-w-xs" for="action">
+                <div class="label">
+                    <span class="label-text">Action:</span>
+                </div>
+                <select class="select select-bordered w-full max-w-xs" id="action" name="action">
+                    <option value="auth_failure">Auth Failure</option>
+                    <option value="authenticated">Authenticated</option>
+                    <option value="change_battery">Change Battery</option>
+                    <option value="change_state">Change State</option>
+                    <option value="disconnected">Disconnected</option>
+                    <option value="group_join">Group Join</option>
+                    <option value="group_leave">Group Leave</option>
+                    <option value="group_admin_changed">Group Admin Changed</option>
+                    <option value="group_membership_request">Group Membership Request</option>
+                    <option value="group_update">Group Update</option>
+                    <option value="contact_changed">Contact Changed</option>
+                    <option value="media_uploaded">Media Uploaded</option>
+                    <option value="message">Message Received</option>
+                    <option value="message_ack">Message Ack</option>
+                    <option value="message_edit">Message Edited</option>
+                    <option value="unread_count">Unread Count Changed</option>
+                    <option value="message_create">Message Created</option>
+                    <option value="message_ciphertext">Message Ciphertext Received</option>
+                    <option value="message_revoke_everyone">Message Revoked for Everyone</option>
+                    <option value="message_revoke_me">Message Revoked by Me</option>
+                    <option value="message_reaction">Message Reaction</option>
+                    <option value="chat_removed">Chat Removed</option>
+                    <option value="chat_archived">Chat Archived/Unarchived</option>
+                    <option value="loading_screen">Loading Screen Appearing</option>
+                    <option value="call">Call Received</option>
+                    <option value="remote_session_saved">Remote Session Saved</option>
+                    <option value="vote_update">Vote Update</option>
+                </select>
+            </label>
+            <label class="form-control w-full max-w-xs" for="webhook">
+                <div class="label">
+                    <span class="label-text">Webhook:</span>
+                </div>
+                <input class="input input-bordered" id="webhook" minlength="3" name="webhook" required type="url"/>
+            </label>
+            <input class="btn btn-primary mt-6 w-full" type="submit" value="Add Hook">
+        </form>
+    </div>
+    <div class="basis-2/3">
+        <form hx-get="/component/webhook-control" hx-target="#webhook-response" hx-trigger="load">
+        </form>
+        <div id="webhook-response"></div>
+    </div>
+</div>

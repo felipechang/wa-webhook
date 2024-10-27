@@ -1,0 +1,8 @@
+.idea
+.env
+webhooks.db
+.wwebjs_auth
+node_modules
+/package-lock.json
+/deno.lock
+/.wwebjs_cache/

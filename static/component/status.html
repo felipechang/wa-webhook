@@ -1,0 +1,10 @@
+<div class="flex flex-row mb-10">
+    <div class="text-3xl mx-auto">Client Status</div>
+</div>
+
+<form hx-get="/component/status-control" hx-target="#status-response" hx-trigger="load, every 1s" id="ready-status">
+</form>
+
+<div class="flex flex-row">
+    <div class="mx-auto" id="status-response"></div>
+</div>
