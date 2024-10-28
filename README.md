@@ -68,7 +68,7 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 - `POST /api/message`
     - Sends a WhatsApp message
     - Required body parameters:
-        - `from`: Sender's contact ID
+        - `recipient`: Recipient's contact ID
         - `message`: Message content to send
 
 All endpoints return JSON responses and include appropriate error handling. Error responses will include a status code

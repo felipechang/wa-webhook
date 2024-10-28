@@ -27,6 +27,7 @@ const webClient = new WebClient();
 webClient.onEventOptionsComponent();
 webClient.onGetContactById(waClient);
 webClient.onGetContacts(waClient);
+webClient.onGetContactsComponent(waClient);
 webClient.onGetGroups(waClient);
 webClient.onGetReadyStatus(waClient);
 webClient.onGetReadyStatusComponent(waClient);

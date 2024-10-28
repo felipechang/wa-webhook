@@ -6,12 +6,21 @@
     <div class="mx-auto">
         <form class="flex flex-col gap-2 w-80" hx-post="/component/message-control" hx-target="#message-response"
               hx-validate>
-            <label class="form-control w-full max-w-xs" for="from">
+            <label class="form-control w-full max-w-xs" for="recipient">
                 <div class="label">
                     <span class="label-text">From:</span>
                 </div>
-                <input class="input input-bordered" id="from" maxlength="20" minlength="3" name="from" required
-                       type="text" value="51900000000@c.us"/>
+                <select
+                        class="select select-bordered w-full max-w-xs"
+                        id="recipient"
+                        name="recipient"
+                        hx-get="/component/contact"
+                        hx-trigger="load"
+                        hx-target="#recipient"
+                        hx-swap="outerHTML"
+                >
+                    <option>Loading...</option>
+                </select>
             </label>
             <label class="form-control w-full max-w-xs" for="message">
                 <div class="label">

@@ -15,7 +15,7 @@ interface MessageBody {
      * @memberof MessageBody
      * @type {string}
      */
-    from: string;
+    recipient: string;
 }
 
 /**

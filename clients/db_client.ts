@@ -55,8 +55,7 @@ class DbClient {
                     webhook.include_reactions,
                 ]);
         } catch (err) {
-            logger.error("Error inserting webhook:", err);
-            throw new Error(`Error inserting webhook: ${err}`);
+            throw new Error(`💾: error inserting webhook: ${err}`);
         } finally {
             logger.info("💾: webhook inserted");
         }
@@ -72,8 +71,7 @@ class DbClient {
         try {
             await client.query(`DELETE FROM webhooks WHERE id = $1`, [id]);
         } catch (err) {
-            logger.error("Error removing webhook:", err);
-            throw new Error(`Error removing webhook: ${err}`);
+            throw new Error(`💾: error removing webhook: ${err}`);
         } finally {
             logger.info("💾: webhook removed");
         }
@@ -92,8 +90,7 @@ class DbClient {
                 webhooks.push(row);
             });
         } catch (err) {
-            logger.error("Error fetching webhooks:", err);
-            throw new Error(`Error fetching webhooks: ${err}`);
+            throw new Error(`💾: error fetching webhooks: ${err}`);
         } finally {
             logger.info("💾: webhooks fetched");
         }
@@ -114,8 +111,7 @@ class DbClient {
                 webhooks.push(row);
             });
         } catch (err) {
-            logger.error("Error fetching webhooks:", err);
-            throw new Error(`Error fetching webhooks: ${err}`);
+            throw new Error(`💾: error fetching webhooks: ${err}`);
         } finally {
             logger.info(`💾: fetching ${eventCode} webhooks`);
         }
@@ -147,8 +143,7 @@ class DbClient {
             );
         `);
         } catch (err) {
-            logger.error("Error recreating webhooks table:", err);
-            throw new Error(`Error recreating webhooks table: ${err}`);
+            throw new Error(`💾: error recreating webhooks table: ${err}`);
         } finally {
             logger.info("💾: webhooks table recreated");
         }

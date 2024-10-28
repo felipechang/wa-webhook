@@ -15,19 +15,19 @@ class WaClient {
      * The events to listen for.
      * @private
      */
-    private events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
+    private events: string[] = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
 
     /**
      * Device link QR code.
      * @private
      */
-    private qr = "";
+    private qr: string = "";
 
     /**
      * Client is ready.
      * @private
      */
-    private ready = false;
+    private ready: boolean = false;
 
 
     /**
@@ -48,12 +48,12 @@ class WaClient {
      */
     public async boot() {
 
-        this.client.on("qr", (qr: string) => {
+        this.client.on("qr", (qr: string): void => {
             this.qr = qr;
             logger.info("📱: QR code generated");
         });
 
-        this.client.on("ready", async () => {
+        this.client.on("ready", async (): Promise<void> => {
             this.qr = "";
             this.ready = true;
             logger.info(`📱: client is ready`);
@@ -98,29 +98,33 @@ class WaClient {
     public async getContacts(): Promise<ChatContact[]> {
         if (!this.ready) throw new Error("Client is not ready");
         const chats = await this.client.getContacts();
-        return chats.map(contact => {
-            return {
-                id: contact.id._serialized,
-                isBlocked: contact.isBlocked,
-                isBusiness: contact.isBusiness,
-                isEnterprise: contact.isEnterprise,
-                isGroup: contact.isGroup,
-                isMe: contact.isMe,
-                isMyContact: contact.isMyContact,
-                isUser: contact.isUser,
-                isWAContact: contact.isWAContact,
-                labels: contact.labels,
-                name: contact.name,
-                number: contact.number,
-                pushname: contact.pushname,
-                sectionHeader: contact.sectionHeader,
-                shortName: contact.shortName,
-                statusMute: contact.statusMute,
-                type: contact.type,
-                verifiedLevel: contact.verifiedLevel,
-                verifiedName: contact.verifiedName
-            }
-        });
+        return chats
+            .filter((contact) => {
+                return contact.id.server !== "lid"
+            })
+            .map(contact => {
+                return {
+                    id: contact.id._serialized,
+                    isBlocked: contact.isBlocked,
+                    isBusiness: contact.isBusiness,
+                    isEnterprise: contact.isEnterprise,
+                    isGroup: contact.isGroup,
+                    isMe: contact.isMe,
+                    isMyContact: contact.isMyContact,
+                    isUser: contact.isUser,
+                    isWAContact: contact.isWAContact,
+                    labels: contact.labels,
+                    name: contact.name,
+                    number: contact.number,
+                    pushname: contact.pushname,
+                    sectionHeader: contact.sectionHeader,
+                    shortName: contact.shortName,
+                    statusMute: contact.statusMute,
+                    type: contact.type,
+                    verifiedLevel: contact.verifiedLevel,
+                    verifiedName: contact.verifiedName
+                }
+            });
     }
 
     /**
@@ -163,7 +167,7 @@ class WaClient {
      * Listens for outgoing messages and calls the callback function.
      * @param {function} callback - The callback function to call with the outgoing message.
      */
-    public onOutgoingListeners(callback: (eventCode: string, message: wa.Message) => void) {
+    public onOutgoingListeners(callback: (eventCode: string, message: wa.Message) => void): void {
         this.events.map((eventCode: string): void => {
             this.client.on(eventCode, (message: Message) => callback(eventCode, message));
         });
@@ -171,15 +175,14 @@ class WaClient {
 
     /**
      * Sends a message to a user.
-     * @param {string} from - The phone number of the user to send the message to.
+     * @param {string} recipient - The phone number of the user to send the message to.
      * @param {string} message - The message to send.
      * @returns {Promise<boolean>}
      */
-    public async sendMessage(from: string, message: string): Promise<boolean> {
+    public async sendMessage(recipient: string, message: string): Promise<void> {
         if (!this.ready) throw new Error("Client is not ready");
-        await this.client.sendMessage(from, message);
+        await this.client.sendMessage(recipient, message);
         logger.info("📱: message sent");
-        return true;
     }
 }
 

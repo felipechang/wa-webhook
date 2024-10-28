@@ -140,6 +140,7 @@ class WebClient {
                 }
             }
             selectOptions.push(`</select>`)
+            res.set("Content-Type", "text/html");
             res.send(Buffer.from(selectOptions.join("")));
         });
     }
@@ -156,7 +157,6 @@ class WebClient {
                 return;
             }
             try {
-                res.set("Content-Type", "text/html");
                 const contact = await waClient.getContactById(req.params.id);
                 res.json(contact);
             } catch (error) {
@@ -174,9 +174,34 @@ class WebClient {
     public onGetContacts(waClient: WaClient): void {
         this.app.get("/api/contact", async (_: Request, res: Response) => {
             try {
-                res.set("Content-Type", "text/html");
                 const contact = await waClient.getContacts();
                 res.json(contact);
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
+        });
+    }
+
+    /**
+     * Returns a list of contacts (component version).
+     *
+     * @param waClient The WhatsApp client.
+     */
+    public onGetContactsComponent(waClient: WaClient): void {
+        this.app.get("/component/contact", async (_: Request, res: Response) => {
+            try {
+                const contact = await waClient.getContacts();
+                const selectOptions = [
+                    `<select class="select select-bordered w-full max-w-xs" id="recipient" name="recipient" required>`
+                ];
+                for (let i = 0; i < contact.length; i++) {
+                    const name = contact[i].verifiedName || contact[i].name || contact[i].pushname;
+                    selectOptions.push(`<option value="${contact[i].id}">${name}</option>`);
+                }
+                selectOptions.push(`</select>`)
+                res.set("Content-Type", "text/html");
+                res.send(Buffer.from(selectOptions.join("")));
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({error: "Internal Server Error"});
@@ -192,7 +217,6 @@ class WebClient {
     public onGetGroups(waClient: WaClient): void {
         this.app.get("/api/groups", async (_: Request, res: Response) => {
             try {
-                res.set("Content-Type", "text/html");
                 const chatGroups = await waClient.getGroups();
                 res.json(chatGroups);
             } catch (error) {
@@ -209,7 +233,6 @@ class WebClient {
     public onGetReadyStatus(waClient: WaClient): void {
         this.app.get("/api/status", async (_: Request, res: Response) => {
             try {
-                res.set("Content-Type", "text/html");
                 const readyStatus = await waClient.getReadyStatus();
                 res.json(readyStatus);
             } catch (error) {
@@ -225,8 +248,8 @@ class WebClient {
      */
     public onGetReadyStatusComponent(waClient: WaClient) {
         this.app.get("/component/status-control", async (_: Request, res: Response) => {
-            res.set("Content-Type", "text/html");
             const readyStatus = await waClient.getReadyStatus();
+            res.set("Content-Type", "text/html");
             if (readyStatus.ready) {
                 res.send(Buffer.from(`
                     <h2>WhatsApp Client is Ready</div>
@@ -245,8 +268,8 @@ class WebClient {
                     <h2 class="mb-4">Use your phone to pair:</h2>
                     <img src="${qrCodeImage}" alt="QR Code"/>
                 `));
-            } catch (err) {
-                console.error("Error generating QR code:", err);
+            } catch (error) {
+                logger.error(`🌐: error generating QR code ${error}`);
                 res.status(500).send("Internal Server Error");
             }
         });
@@ -292,7 +315,8 @@ class WebClient {
             const webhook = WebClient.makeHook(req.body);
             try {
                 await dbClient.insertWebhook(webhook);
-                res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+                res.set("Content-Type", "text/html");
+                res.send(Buffer.from(this.listWebhooksComponent(await dbClient.fetchAllWebhooks())));
             } catch (error) {
                 logger.error(error);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
@@ -324,7 +348,8 @@ class WebClient {
     public onHookGetComponent(dbClient: DbClient): void {
         this.app.get("/component/webhook-control", async (_: Request<Webhook>, res: Response) => {
             try {
-                res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+                res.set("Content-Type", "text/html");
+                res.send(Buffer.from(this.listWebhooksComponent(await dbClient.fetchAllWebhooks())));
             } catch (error) {
                 logger.error(error);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
@@ -348,8 +373,7 @@ class WebClient {
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({error: "Internal Server Error"});
-            }
-            finally {
+            } finally {
                 logger.info(`🌐: hook removed: id=${req.params.id}`);
             }
         });
@@ -363,11 +387,12 @@ class WebClient {
         this.app.delete("/component/webhook-control/:id", async (req: Request<{ id: string }>, res: Response) => {
             try {
                 await dbClient.removeWebhook(req.params.id);
-                res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+                res.set("Content-Type", "text/html");
+                res.send(Buffer.from(this.listWebhooksComponent(await dbClient.fetchAllWebhooks())));
             } catch (error) {
                 logger.error(error);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
-            }finally {
+            } finally {
                 logger.info(`🌐: hook removed: id=${req.params.id}`);
             }
         });
@@ -383,8 +408,8 @@ class WebClient {
                 res.status(400).json({error: "Invalid request body"});
                 return;
             }
-            if (!req.body.from) {
-                res.status(400).json({error: "from is a required parameter"});
+            if (!req.body.recipient) {
+                res.status(400).json({error: "recipient is a required parameter"});
                 return;
             }
             if (!req.body.message) {
@@ -392,13 +417,13 @@ class WebClient {
                 return;
             }
             try {
-                const sent = await waClient.sendMessage(req.body.from, req.body.message);
-                res.json({sent});
+                await waClient.sendMessage(req.body.recipient, req.body.message);
+                res.json({});
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({error: "Internal Server Error"});
             } finally {
-                logger.info(`🌐: received message from ${req.body.from}: ${req.body.message}`);
+                logger.info(`🌐: relayed message to ${req.body.recipient}: ${req.body.message}`);
             }
         });
     }
@@ -410,15 +435,14 @@ class WebClient {
     public onIncomingMessageComponent(waClient: WaClient): void {
         this.app.post("/component/message-control", async (req: Request<MessageBody>, res: Response) => {
             try {
-                logger.info(`🌐: received message from ${req.body.from}: ${req.body.message}`);
-                const sent = await waClient.sendMessage(req.body.from, req.body.message);
-                res.send(Buffer.from(sent ?
-                    this.alertComponent("alert-success", "Message sent") :
-                    this.alertComponent("alert-error", "Client is not ready")
-                ));
+                await waClient.sendMessage(req.body.recipient, req.body.message);
+                res.set("Content-Type", "text/html");
+                res.send(Buffer.from(this.alertComponent("alert-success", "Message sent")));
             } catch (error) {
                 logger.error(error);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            } finally {
+                logger.info(`🌐: relayed message to ${req.body.recipient}: ${req.body.message}`);
             }
         });
     }
@@ -448,11 +472,11 @@ class WebClient {
     }
 
     /**
-     * Generates a list component.
+     * Generates a component list of webhooks.
      * @param webhooks The webhooks to display.
      * @return The HTML for the list component.
      */
-    private listComponent(webhooks: Webhook[]): string {
+    private listWebhooksComponent(webhooks: Webhook[]): string {
         const nodes = [
             `<div class="overflow-x-auto">`,
             `<table class="table">`,
