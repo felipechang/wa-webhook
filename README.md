@@ -74,20 +74,9 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 
 **Authentication**
 
-All API endpoints require the `X-Api-Key` header to be set to a valid API key. You can obtain an API key by setting
-the `WA_WEBHOOK_API_AUTH` environment variable.
+All API endpoints can optionally require the `X-Api-Key` header by setting the `WA_WEBHOOK_API_AUTH` environment
+variable. When left bank authentication is disabled.
 
-Example:
-
-```bash
-export WA_WEBHOOK_API_AUTH=xvB9e290C9TuZ02HiyAAXzxvTvmT
-```
-
-You can also set the API key in your request headers:
-
-```bash
-X-Api-Key: xvB9e290C9TuZ02HiyAAXzxvTvmT
-```
 
 All endpoints return JSON responses and include appropriate error handling. Error responses will include a status code
 and an error message in the following format:

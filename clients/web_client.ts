@@ -612,6 +612,8 @@ class WebClient {
      * @private
      */
     private validateHeaderKey(req: Request<any>): string {
+        const sysKey = process.env.WA_WEBHOOK_API_AUTH;
+        if (!sysKey) return "";
         if (!req.headers || !req.headers['X-API-Key']) {
             return "Missing API key header";
         }
@@ -620,7 +622,7 @@ class WebClient {
         if (!apiKey) {
             return "Missing API key";
         }
-        if (apiKey !== process.env.WA_WEBHOOK_API_AUTH) {
+        if (apiKey !== sysKey) {
             return "Invalid API key";
         }
         return "";
