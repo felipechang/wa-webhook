@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${WA_WEBHOOK_POSTGRES_USER}
       POSTGRES_PASSWORD: ${WA_WEBHOOK_POSTGRES_PASSWORD}
       POSTGRES_DB: ${WA_WEBHOOK_POSTGRES_DB}
-      POSTGRES_HOST: ${WA_WEBHOOK_POSTGRES_HOST}
+      POSTGRES_HOST: db
     volumes:
       - auth:/app/.wwebjs_auth
       - cache:/app/.wwebjs_cache
@@ -20,7 +20,7 @@ services:
 
   db:
     image: postgres:14-alpine
-    container_name: wa-postUrl-db
+    container_name: wa-webhook-db
     restart: unless-stopped
     expose:
       - 5432:5432

@@ -40,8 +40,8 @@ class DbClient {
                 webhook.includeReactions,
             ]);
         } catch (err) {
-            logger.error("Error inserting postUrl:", err);
-            throw new Error(`Error inserting postUrl: ${err}`);
+            logger.error("Error inserting webhook:", err);
+            throw new Error(`Error inserting webhook: ${err}`);
         } finally {
             logger.info("Webhook inserted");
         }
@@ -57,8 +57,8 @@ class DbClient {
         try {
             await client.query(`DELETE FROM webhooks WHERE id = $1`, [id]);
         } catch (err) {
-            logger.error("Error removing postUrl:", err);
-            throw new Error(`Error removing postUrl: ${err}`);
+            logger.error("Error removing webhook:", err);
+            throw new Error(`Error removing webhook: ${err}`);
         } finally {
             logger.info("Webhook removed");
         }
