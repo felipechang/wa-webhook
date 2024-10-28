@@ -16,6 +16,17 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 - **Message Handling**: Send and receive WhatsApp messages programmatically
 - **Bot Integration**: API endpoints for bot implementation
 
+Here is the completed TODO section for the user interface:
+
+## 📊 User Interface
+
+Divided into three sections:
+
+* **Status**: View the current status of your WhatsApp client, including connection status and QR code (if not
+  authenticated).
+* **Messaging**: Test sending WhatsApp messages programmatically.
+* **Webhooks**: Manage your webhook subscriptions, including creating, reading, and deleting webhooks.
+
 ## 📋 API Reference
 
 ### Contact Management
@@ -76,7 +87,6 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 
 All API endpoints can optionally require the `X-Api-Key` header by setting the `WA_WEBHOOK_API_AUTH` environment
 variable. When left bank authentication is disabled.
-
 
 All endpoints return JSON responses and include appropriate error handling. Error responses will include a status code
 and an error message in the following format:
