@@ -1,7 +1,8 @@
 services:
-  wa-webhook:
+
+  wa-webhook-app:
     image: canicaperu/wa-webhook-app
-    container_name: wa-postUrl
+    container_name: wa-webhook-app
     restart: unless-stopped
     ports:
       - "${WA_WEBHOOK_PORT}:5000"

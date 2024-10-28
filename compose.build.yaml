@@ -1,7 +1,8 @@
 services:
-  wa-webhook:
+
+  app:
     build: .
-    container_name: wa-postUrl
+    container_name: wa-webhook-app
     restart: unless-stopped
     ports:
       - "${WA_WEBHOOK_PORT}:5000"
@@ -14,10 +15,10 @@ services:
       - auth:/app/.wwebjs_auth
       - cache:/app/.wwebjs_cache
     depends_on:
-      wa-webhook-db:
+      db:
         condition: service_healthy
 
-  wa-webhook-db:
+  db:
     image: postgres:14-alpine
     container_name: wa-postUrl-db
     restart: unless-stopped
