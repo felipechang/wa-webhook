@@ -59,89 +59,96 @@ class WebClient {
      */
     public onEventOptionsComponent(): void {
         this.app.get("/component/event-options", async (_: Request<Webhook>, res: Response) => {
-            const events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
-            const selectOptions = [
-                `<select class="select select-bordered w-full max-w-xs" id="event_code" name="event_code">`
-            ];
-            for (let i = 0; i < events.length; i++) {
-                switch (events[i]) {
-                    case "change_battery":
-                        selectOptions.push(`<option value="change_battery">Change Battery</option>`);
-                        break;
-                    case "change_state":
-                        selectOptions.push(`<option value="change_state">Change State</option>`);
-                        break;
-                    case "disconnected":
-                        selectOptions.push(`<option value="disconnected">Disconnected</option>`);
-                        break;
-                    case "group_join":
-                        selectOptions.push(`<option value="group_join">Group Join</option>`);
-                        break;
-                    case "group_leave":
-                        selectOptions.push(`<option value="group_leave">Group Leave</option>`);
-                        break;
-                    case "group_admin_changed":
-                        selectOptions.push(`<option value="group_admin_changed">Group Admin Changed</option>`);
-                        break;
-                    case "group_membership_request":
-                        selectOptions.push(`<option value="group_membership_request">Group Membership Request</option>`);
-                        break;
-                    case "group_update":
-                        selectOptions.push(`<option value="group_update">Group Update</option>`);
-                        break;
-                    case "contact_changed":
-                        selectOptions.push(`<option value="contact_changed">Contact Changed</option>`);
-                        break;
-                    case "media_uploaded":
-                        selectOptions.push(`<option value="media_uploaded">Media Uploaded</option>`);
-                        break;
-                    case "message":
-                        selectOptions.push(`<option value="message">Message Received</option>`);
-                        break;
-                    case "message_ack":
-                        selectOptions.push(`<option value="message_ack">Message Ack</option>`);
-                        break;
-                    case "message_edit":
-                        selectOptions.push(`<option value="message_edit">Message Edited</option>`);
-                        break;
-                    case "unread_count":
-                        selectOptions.push(`<option value="unread_count">Unread Count Changed</option>`);
-                        break;
-                    case "message_create":
-                        selectOptions.push(`<option value="message_create">Message Created</option>`);
-                        break;
-                    case "message_ciphertext":
-                        selectOptions.push(`<option value="message_ciphertext">Message Ciphertext Received</option>`);
-                        break;
-                    case "message_revoke_everyone":
-                        selectOptions.push(`<option value="message_revoke_everyone">Message Revoked for Everyone</option>`);
-                        break;
-                    case "message_revoke_me":
-                        selectOptions.push(`<option value="message_revoke_me">Message Revoked by Me</option>`);
-                        break;
-                    case "message_reeventCode":
-                        selectOptions.push(`<option value="message_reeventCode">Message ReeventCode</option>`);
-                        break;
-                    case "chat_removed":
-                        selectOptions.push(`<option value="chat_removed">Chat Removed</option>`);
-                        break;
-                    case "chat_archived":
-                        selectOptions.push(`<option value="chat_archived">Chat Archived/Unarchived</option>`);
-                        break;
-                    case "call":
-                        selectOptions.push(`<option value="call">Call Received</option>`);
-                        break;
-                    case "remote_session_saved":
-                        selectOptions.push(`<option value="remote_session_saved">Remote Session Saved</option>`);
-                        break;
-                    case "vote_update":
-                        selectOptions.push(`<option value="vote_update">Vote Update</option>`);
-                        break;
+            try {
+                const events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
+                const selectOptions = [
+                    `<select class="select select-bordered w-full max-w-xs" id="event_code" name="event_code">`
+                ];
+                for (let i = 0; i < events.length; i++) {
+                    switch (events[i]) {
+                        case "change_battery":
+                            selectOptions.push(`<option value="change_battery">Change Battery</option>`);
+                            break;
+                        case "change_state":
+                            selectOptions.push(`<option value="change_state">Change State</option>`);
+                            break;
+                        case "disconnected":
+                            selectOptions.push(`<option value="disconnected">Disconnected</option>`);
+                            break;
+                        case "group_join":
+                            selectOptions.push(`<option value="group_join">Group Join</option>`);
+                            break;
+                        case "group_leave":
+                            selectOptions.push(`<option value="group_leave">Group Leave</option>`);
+                            break;
+                        case "group_admin_changed":
+                            selectOptions.push(`<option value="group_admin_changed">Group Admin Changed</option>`);
+                            break;
+                        case "group_membership_request":
+                            selectOptions.push(`<option value="group_membership_request">Group Membership Request</option>`);
+                            break;
+                        case "group_update":
+                            selectOptions.push(`<option value="group_update">Group Update</option>`);
+                            break;
+                        case "contact_changed":
+                            selectOptions.push(`<option value="contact_changed">Contact Changed</option>`);
+                            break;
+                        case "media_uploaded":
+                            selectOptions.push(`<option value="media_uploaded">Media Uploaded</option>`);
+                            break;
+                        case "message":
+                            selectOptions.push(`<option value="message">Message Received</option>`);
+                            break;
+                        case "message_ack":
+                            selectOptions.push(`<option value="message_ack">Message Ack</option>`);
+                            break;
+                        case "message_edit":
+                            selectOptions.push(`<option value="message_edit">Message Edited</option>`);
+                            break;
+                        case "unread_count":
+                            selectOptions.push(`<option value="unread_count">Unread Count Changed</option>`);
+                            break;
+                        case "message_create":
+                            selectOptions.push(`<option value="message_create">Message Created</option>`);
+                            break;
+                        case "message_ciphertext":
+                            selectOptions.push(`<option value="message_ciphertext">Message Ciphertext Received</option>`);
+                            break;
+                        case "message_revoke_everyone":
+                            selectOptions.push(`<option value="message_revoke_everyone">Message Revoked for Everyone</option>`);
+                            break;
+                        case "message_revoke_me":
+                            selectOptions.push(`<option value="message_revoke_me">Message Revoked by Me</option>`);
+                            break;
+                        case "message_reeventCode":
+                            selectOptions.push(`<option value="message_reeventCode">Message ReeventCode</option>`);
+                            break;
+                        case "chat_removed":
+                            selectOptions.push(`<option value="chat_removed">Chat Removed</option>`);
+                            break;
+                        case "chat_archived":
+                            selectOptions.push(`<option value="chat_archived">Chat Archived/Unarchived</option>`);
+                            break;
+                        case "call":
+                            selectOptions.push(`<option value="call">Call Received</option>`);
+                            break;
+                        case "remote_session_saved":
+                            selectOptions.push(`<option value="remote_session_saved">Remote Session Saved</option>`);
+                            break;
+                        case "vote_update":
+                            selectOptions.push(`<option value="vote_update">Vote Update</option>`);
+                            break;
+                    }
                 }
+                selectOptions.push(`</select>`)
+                res.set("Content-Type", "text/html");
+                res.send(Buffer.from(selectOptions.join("")));
+            } catch (error: any) {
+                logger.error(`🌐: error fetching options component: ${error}`);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            } finally {
+                logger.info(`🌐: event options component fetch successful`);
             }
-            selectOptions.push(`</select>`)
-            res.set("Content-Type", "text/html");
-            res.send(Buffer.from(selectOptions.join("")));
         });
     }
 
@@ -159,9 +166,11 @@ class WebClient {
             try {
                 const contact = await waClient.getContactById(req.params.id);
                 res.json(contact);
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error fetching contact by id: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: contact by id fetch successful`);
             }
         });
     }
@@ -176,9 +185,11 @@ class WebClient {
             try {
                 const contact = await waClient.getContacts();
                 res.json(contact);
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error fetching contacts: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: contact fetch successful`);
             }
         });
     }
@@ -192,19 +203,31 @@ class WebClient {
         this.app.get("/component/contact", async (_: Request, res: Response) => {
             try {
                 const contact = await waClient.getContacts();
+                const contactOptions = contact.map((c) => {
+                    return {
+                        name: c.verifiedName || c.name || c.pushname,
+                        value: c.id,
+                        selected: c.isMe
+                    }
+                }).sort((a, b) => {
+                    if (a.name < b.name) return -1;
+                    if (a.name > b.name) return 1;
+                    return 0;
+                });
                 const selectOptions = [
                     `<select class="select select-bordered w-full max-w-xs" id="recipient" name="recipient" required>`
                 ];
-                for (let i = 0; i < contact.length; i++) {
-                    const name = contact[i].verifiedName || contact[i].name || contact[i].pushname;
-                    selectOptions.push(`<option value="${contact[i].id}">${name}</option>`);
+                for (let i = 0; i < contactOptions.length; i++) {
+                    selectOptions.push(`<option value="${contactOptions[i].value}" ${contactOptions[i].selected ? "selected" : ""}>${contactOptions[i].name}</option>`);
                 }
                 selectOptions.push(`</select>`)
                 res.set("Content-Type", "text/html");
                 res.send(Buffer.from(selectOptions.join("")));
-            } catch (error) {
-                logger.error(error);
-                res.status(500).json({error: "Internal Server Error"});
+            } catch (error: any) {
+                logger.error(`🌐: error fetching contact list component: ${error?.message}`);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            } finally {
+                logger.info(`🌐: contact list component fetch successful`);
             }
         });
     }
@@ -219,9 +242,11 @@ class WebClient {
             try {
                 const chatGroups = await waClient.getGroups();
                 res.json(chatGroups);
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error fetching group list: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: group fetch successful`);
             }
         });
     }
@@ -235,9 +260,11 @@ class WebClient {
             try {
                 const readyStatus = await waClient.getReadyStatus();
                 res.json(readyStatus);
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error fetching on-ready-status: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: on-ready-status fetch successful`);
             }
         });
     }
@@ -268,9 +295,11 @@ class WebClient {
                     <h2 class="mb-4">Use your phone to pair:</h2>
                     <img src="${qrCodeImage}" alt="QR Code"/>
                 `));
-            } catch (error) {
-                logger.error(`🌐: error generating QR code ${error}`);
-                res.status(500).send("Internal Server Error");
+            } catch (error: any) {
+                logger.error(`🌐: error generating QR code: ${error?.message}`);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            } finally {
+                logger.info(`🌐: on-ready-status component fetch successful`);
             }
         });
     }
@@ -297,11 +326,11 @@ class WebClient {
             try {
                 await dbClient.insertWebhook(webhook);
                 res.json({});
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error adding webhook: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
             } finally {
-                logger.info(`🌐: hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
+                logger.info(`🌐: webhook add successful`);
             }
         });
     }
@@ -317,11 +346,11 @@ class WebClient {
                 await dbClient.insertWebhook(webhook);
                 res.set("Content-Type", "text/html");
                 res.send(Buffer.from(this.listWebhooksComponent(await dbClient.fetchAllWebhooks())));
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error adding webhook component: ${error?.message}`);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
             } finally {
-                logger.info(`🌐: hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
+                logger.info(`🌐: webhook add component successful`);
             }
         });
     }
@@ -334,9 +363,11 @@ class WebClient {
         this.app.get("/api/webhook", async (_: Request<Webhook>, res: Response) => {
             try {
                 res.json(await dbClient.fetchAllWebhooks());
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error fetching webhook list: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: webhook list fetch successful`);
             }
         });
     }
@@ -350,9 +381,11 @@ class WebClient {
             try {
                 res.set("Content-Type", "text/html");
                 res.send(Buffer.from(this.listWebhooksComponent(await dbClient.fetchAllWebhooks())));
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error fetching webhook list component: ${error?.message}`);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            } finally {
+                logger.info(`🌐: webhook list fetch component successful`);
             }
         });
     }
@@ -370,11 +403,11 @@ class WebClient {
             try {
                 await dbClient.removeWebhook(req.params.id);
                 res.json({});
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error removing webhook: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
             } finally {
-                logger.info(`🌐: hook removed: id=${req.params.id}`);
+                logger.info(`🌐: webhook removal successful`);
             }
         });
     }
@@ -389,11 +422,11 @@ class WebClient {
                 await dbClient.removeWebhook(req.params.id);
                 res.set("Content-Type", "text/html");
                 res.send(Buffer.from(this.listWebhooksComponent(await dbClient.fetchAllWebhooks())));
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error removing webhook component: ${error?.message}`);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
             } finally {
-                logger.info(`🌐: hook removed: id=${req.params.id}`);
+                logger.info(`🌐: webhook removal component successful`);
             }
         });
     }
@@ -419,11 +452,11 @@ class WebClient {
             try {
                 await waClient.sendMessage(req.body.recipient, req.body.message);
                 res.json({});
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error relaying message: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
             } finally {
-                logger.info(`🌐: relayed message to ${req.body.recipient}: ${req.body.message}`);
+                logger.info(`🌐: message relay successful`);
             }
         });
     }
@@ -438,11 +471,11 @@ class WebClient {
                 await waClient.sendMessage(req.body.recipient, req.body.message);
                 res.set("Content-Type", "text/html");
                 res.send(Buffer.from(this.alertComponent("alert-success", "Message sent")));
-            } catch (error) {
-                logger.error(error);
+            } catch (error: any) {
+                logger.error(`🌐: error relaying message component: ${error?.message}`);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
             } finally {
-                logger.info(`🌐: relayed message to ${req.body.recipient}: ${req.body.message}`);
+                logger.info(`🌐: message relay component successful`);
             }
         });
     }
@@ -482,6 +515,7 @@ class WebClient {
             `<table class="table">`,
             `<thead>`,
             `<tr>`,
+            `    <th></th>`,
             `    <th>Event</th>`,
             `    <th>URL</th>`,
             `    <th>➕ Info</th>`,
@@ -493,7 +527,6 @@ class WebClient {
             `    <th>➕ Mentions</th>`,
             `    <th>➕ Payment</th>`,
             `    <th>➕ Reactions</th>`,
-            `    <th></th>`,
             `<tr>`,
             `</thead>`,
             `<tbody>`,
@@ -503,6 +536,11 @@ class WebClient {
             const webhook = webhooks[i];
             nodes.push(`
         <tr>
+            <td>
+            <button hx-delete="/component/webhook-control/${webhook.id}" hx-target="#webhook-response">
+               💀
+            </button>
+          </td>
           <td>${webhook.event_code}</td>
           <td>${webhook.post_url}</td>
           <td>${webhook.include_info ? "✅" : "🚫"}</td>
@@ -514,11 +552,6 @@ class WebClient {
           <td>${webhook.include_mentions ? "✅" : "🚫"}</td>
           <td>${webhook.include_payment ? "✅" : "🚫"}</td>
           <td>${webhook.include_reactions ? "✅" : "🚫"}</td>
-          <td>
-            <button hx-delete="/component/webhook-control/${webhook.id}" hx-target="#webhook-response">
-               💀
-            </button>
-          </td>
         </tr>`);
         }
 

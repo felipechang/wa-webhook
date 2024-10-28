@@ -69,62 +69,73 @@ class WaClient {
      * @returns {Promise<ChatContact>} A promise that resolves to the contact with the given ID.
      */
     public async getContactById(contactId: string): Promise<ChatContact> {
-        if (!this.ready) throw new Error("Client is not ready");
-        const contact = await this.client.getContactById(contactId);
-        return {
-            id: contact.id._serialized,
-            isBlocked: contact.isBlocked,
-            isBusiness: contact.isBusiness,
-            isEnterprise: contact.isEnterprise,
-            isGroup: contact.isGroup,
-            isMe: contact.isMe,
-            isMyContact: contact.isMyContact,
-            isUser: contact.isUser,
-            isWAContact: contact.isWAContact,
-            labels: contact.labels,
-            name: contact.name,
-            number: contact.number,
-            pushname: contact.pushname,
-            sectionHeader: contact.sectionHeader,
-            shortName: contact.shortName,
-            statusMute: contact.statusMute,
-            type: contact.type,
-            verifiedLevel: contact.verifiedLevel,
-            verifiedName: contact.verifiedName
+        if (!this.ready) throw new Error("client is not ready");
+        try {
+            const contact = await this.client.getContactById(contactId);
+            logger.info(`📱: contact with id=${contactId} fetched`);
+            return {
+                id: contact.id._serialized,
+                isBlocked: contact.isBlocked,
+                isBusiness: contact.isBusiness,
+                isEnterprise: contact.isEnterprise,
+                isGroup: contact.isGroup,
+                isMe: contact.isMe,
+                isMyContact: contact.isMyContact,
+                isUser: contact.isUser,
+                isWAContact: contact.isWAContact,
+                labels: contact.labels,
+                name: contact.name,
+                number: contact.number,
+                pushname: contact.pushname,
+                sectionHeader: contact.sectionHeader,
+                shortName: contact.shortName,
+                statusMute: contact.statusMute,
+                type: contact.type,
+                verifiedLevel: contact.verifiedLevel,
+                verifiedName: contact.verifiedName
+            }
+        } catch (error) {
+            throw new Error(`📱: error fetching contact with id=${contactId}: ${error}`);
         }
     }
 
 
     public async getContacts(): Promise<ChatContact[]> {
-        if (!this.ready) throw new Error("Client is not ready");
-        const chats = await this.client.getContacts();
-        return chats
-            .filter((contact) => {
-                return contact.id.server !== "lid"
-            })
-            .map(contact => {
-                return {
-                    id: contact.id._serialized,
-                    isBlocked: contact.isBlocked,
-                    isBusiness: contact.isBusiness,
-                    isEnterprise: contact.isEnterprise,
-                    isGroup: contact.isGroup,
-                    isMe: contact.isMe,
-                    isMyContact: contact.isMyContact,
-                    isUser: contact.isUser,
-                    isWAContact: contact.isWAContact,
-                    labels: contact.labels,
-                    name: contact.name,
-                    number: contact.number,
-                    pushname: contact.pushname,
-                    sectionHeader: contact.sectionHeader,
-                    shortName: contact.shortName,
-                    statusMute: contact.statusMute,
-                    type: contact.type,
-                    verifiedLevel: contact.verifiedLevel,
-                    verifiedName: contact.verifiedName
-                }
-            });
+        if (!this.ready) throw new Error("client is not ready");
+        try {
+            const chats = await this.client.getContacts();
+            logger.info(`📱: contacts fetched`);
+            return chats
+                .filter((contact) => {
+                    // See https://github.com/pedroslopez/whatsapp-web.js/issues/2330
+                    return contact.id.server !== "lid"
+                })
+                .map(contact => {
+                    return {
+                        id: contact.id._serialized,
+                        isBlocked: contact.isBlocked,
+                        isBusiness: contact.isBusiness,
+                        isEnterprise: contact.isEnterprise,
+                        isGroup: contact.isGroup,
+                        isMe: contact.isMe,
+                        isMyContact: contact.isMyContact,
+                        isUser: contact.isUser,
+                        isWAContact: contact.isWAContact,
+                        labels: contact.labels,
+                        name: contact.name,
+                        number: contact.number,
+                        pushname: contact.pushname,
+                        sectionHeader: contact.sectionHeader,
+                        shortName: contact.shortName,
+                        statusMute: contact.statusMute,
+                        type: contact.type,
+                        verifiedLevel: contact.verifiedLevel,
+                        verifiedName: contact.verifiedName
+                    }
+                });
+        } catch (error) {
+            throw new Error(`📱: error fetching contacts: ${error}`);
+        }
     }
 
     /**
@@ -133,23 +144,28 @@ class WaClient {
      * @returns {Promise<ChatGroup[]>} A promise that resolves to an array of chat groups.
      */
     public async getGroups(): Promise<ChatGroup[]> {
-        if (!this.ready) throw new Error("Client is not ready");
-        const chats = await this.client.getChats();
-        return chats
-            .filter(chat => chat.isGroup)
-            .map(chat => {
-                return {
-                    id: chat.id._serialized,
-                    name: chat.name,
-                    archived: chat.archived,
-                    isReadOnly: chat.isReadOnly,
-                    isMuted: chat.isMuted,
-                    muteExpiration: chat.muteExpiration,
-                    timestamp: chat.timestamp,
-                    unreadCount: chat.unreadCount,
-                    pinned: chat.pinned
-                } as ChatGroup
-            });
+        if (!this.ready) throw new Error("client is not ready");
+        try {
+            const chats = await this.client.getChats();
+            logger.info(`📱: groups fetched`);
+            return chats
+                .filter(chat => chat.isGroup)
+                .map(chat => {
+                    return {
+                        id: chat.id._serialized,
+                        name: chat.name,
+                        archived: chat.archived,
+                        isReadOnly: chat.isReadOnly,
+                        isMuted: chat.isMuted,
+                        muteExpiration: chat.muteExpiration,
+                        timestamp: chat.timestamp,
+                        unreadCount: chat.unreadCount,
+                        pinned: chat.pinned
+                    } as ChatGroup
+                });
+        } catch (error) {
+            throw new Error(`📱: error fetching contacts: ${error}`);
+        }
     }
 
     /**
@@ -180,9 +196,14 @@ class WaClient {
      * @returns {Promise<boolean>}
      */
     public async sendMessage(recipient: string, message: string): Promise<void> {
-        if (!this.ready) throw new Error("Client is not ready");
-        await this.client.sendMessage(recipient, message);
-        logger.info("📱: message sent");
+        if (!this.ready) throw new Error("client is not ready");
+        try {
+            await this.client.sendMessage(recipient, message);
+        } catch (error) {
+            throw new Error(`📱: error sending message ${error}`);
+        } finally {
+            logger.info(`📱: message sent to ${recipient}`);
+        }
     }
 }
 

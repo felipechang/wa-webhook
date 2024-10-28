@@ -8,7 +8,7 @@
               hx-validate>
             <label class="form-control w-full max-w-xs" for="recipient">
                 <div class="label">
-                    <span class="label-text">From:</span>
+                    <span class="label-text">Recipient:</span>
                 </div>
                 <select
                         class="select select-bordered w-full max-w-xs"
@@ -26,7 +26,8 @@
                 <div class="label">
                     <span class="label-text">Message:</span>
                 </div>
-                <input class="input input-bordered" id="message" minlength="3" name="message" required type="text"/>
+                <textarea id="message" minlength="3" name="message" required
+                          class="textarea textarea-bordered"></textarea>
             </label>
             <div class="grid pt-4 pl-2 pr-2 justify-items-center">
                 <input class="btn btn-primary w-full" type="submit" value="Send">

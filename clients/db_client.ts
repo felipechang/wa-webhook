@@ -57,7 +57,7 @@ class DbClient {
         } catch (err) {
             throw new Error(`💾: error inserting webhook: ${err}`);
         } finally {
-            logger.info("💾: webhook inserted");
+            logger.info(`💾: webhook with event_code=${webhook.event_code}, post_url=${webhook.post_url} inserted into database`);
         }
         await client.end();
     }
@@ -73,7 +73,7 @@ class DbClient {
         } catch (err) {
             throw new Error(`💾: error removing webhook: ${err}`);
         } finally {
-            logger.info("💾: webhook removed");
+            logger.info(`💾: webhook with id=${id} removed from database`);
         }
         await client.end();
     }
@@ -92,7 +92,7 @@ class DbClient {
         } catch (err) {
             throw new Error(`💾: error fetching webhooks: ${err}`);
         } finally {
-            logger.info("💾: webhooks fetched");
+            logger.info(`💾: webhooks fetched from database`);
         }
         await client.end();
         return webhooks;
@@ -113,7 +113,7 @@ class DbClient {
         } catch (err) {
             throw new Error(`💾: error fetching webhooks: ${err}`);
         } finally {
-            logger.info(`💾: fetching ${eventCode} webhooks`);
+            logger.info(`💾: webhooks with event_code=${eventCode} fetched from database`);
         }
         await client.end();
         return webhooks;
