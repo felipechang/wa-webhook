@@ -37,8 +37,12 @@ class WaClient {
         this.client = new wa.Client({
             authStrategy: new wa.LocalAuth(),
             puppeteer: process.env.NODE_ENV === "development" ? {} : {
-                executablePath: "/usr/bin/google-chrome",
-                args: ["--no-sandbox", "--disable-setuid-sandbox"]
+                executablePath: '/usr/bin/google-chrome',
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--user-data-dir=/tmp/chrome-data'
+                ]
             }
         });
     }

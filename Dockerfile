@@ -1,50 +1,42 @@
 # Use Node.js 20 slim version as the base image
 FROM node:20-slim
 
-# Skip downloading Chromium since we'll be using Google Chrome instead
-# This helps reduce the image size
+# Skip downloading Chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Install Google Chrome Stable and required dependencies
-# This block:
-# 1. Updates package list
-# 2. Installs gnupg and wget for key management and downloads
-# 3. Downloads and adds Google's signing key
-# 4. Adds Google Chrome repository
-# 5. Updates package list with new repository
-# 6. Installs Chrome without recommended packages
-# 7. Cleans up apt cache to reduce image size
-RUN apt-get update &&  \
-    apt-get install gnupg wget -y && \
+# Install Google Chrome Stable and dependencies
+RUN apt-get update && \
+    apt-get install -y gnupg wget && \
     wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg && \
     sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' && \
     apt-get update && \
-    apt-get install google-chrome-stable -y --no-install-recommends && \
+    apt-get install -y google-chrome-stable --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user for security
+# Create non-root user
 RUN useradd -ms /bin/bash api
 
-# Create application directory
-RUN mkdir -p /home/api/src
+# Create required directories
+RUN mkdir -p /home/api/src/.wwebjs_auth /home/api/src/.wwebjs_cache /tmp/chrome-data
 
 # Set working directory
 WORKDIR /home/api/src
 
-# Copy application files to container
+# Copy application files
 COPY . .
 
-# Change ownership of application files to non-root user
-RUN chown -R api:api /home/api
+# Set permissions
+RUN chown -R api:api /home/api /tmp/chrome-data && \
+    chmod -R 755 /home/api/src/.wwebjs_auth /home/api/src/.wwebjs_cache /tmp/chrome-data
 
-# Switch to non-root user for security
+# Switch to non-root user
 USER api
 
-# Install application dependencies
+# Install dependencies
 RUN npm install
 
-# Expose port 5000 for the application
+# Expose port
 EXPOSE 5000
 
-# Start the application
+# Start application
 CMD ["npm", "run", "start"]

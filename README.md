@@ -16,17 +16,6 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 - **Message Handling**: Send and receive WhatsApp messages programmatically
 - **Bot Integration**: API endpoints for bot implementation
 
-Here is the completed TODO section for the user interface:
-
-## 📊 User Interface
-
-Divided into three sections:
-
-* **Status**: View the current status of your WhatsApp client, including connection status and QR code (if not
-  authenticated).
-* **Messaging**: Test sending WhatsApp messages programmatically.
-* **Webhooks**: Manage your webhook subscriptions, including creating, reading, and deleting webhooks.
-
 ## 📋 API Reference
 
 ### Contact Management
@@ -126,6 +115,26 @@ docker compose -f compose.build.yaml up -d
 ```bash
 docker compose up -d
 ```
+
+## 📊 User Interface
+
+Divided into three sections:
+
+* **Status**: View the current status of your WhatsApp client, including connection status and QR code (if not
+  authenticated).
+
+- QR waiting to be paired
+  ![qr.png](images/qr.png)
+- Client ready
+  ![ready.png](images/ready.png)
+
+
+* **Messaging**: Test sending WhatsApp messages to your contacts.
+  ![message.png](images/message.png)
+
+
+* **Webhooks**: Manage your webhook subscriptions, including creating, reading, and deleting webhooks.
+  ![webhooks.png](images/webhooks.png)
 
 ## 🤝 Contributing
 
