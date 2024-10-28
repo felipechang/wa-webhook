@@ -14,8 +14,8 @@ services:
       WA_WEBHOOK_API_AUTH: ${WA_WEBHOOK_API_AUTH}
       POSTGRES_HOST: wa-webhook-db
     volumes:
-      - auth:/app/.wwebjs_auth
-      - cache:/app/.wwebjs_cache
+      - auth:/home/api/src/.wwebjs_auth
+      - cache:/home/api/src/.wwebjs_cache
     depends_on:
       wa-webhook-db:
         condition: service_healthy
