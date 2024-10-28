@@ -20,15 +20,28 @@ class DbClient {
 
     /**
      * Inserts a webhook into the database.
-     * @param {string} action - The action of the webhook.
-     * @param {string} webhook - The webhook URL.
+     * @param {Webhook} webhook - The webhook to insert.
      */
-    public async insertWebhook(action: string, webhook: string): Promise<void> {
+    public async insertWebhook(webhook: Webhook): Promise<void> {
         const client = await this.NewClient();
         try {
-            await client.query(`INSERT INTO webhooks (action, webhook) VALUES ($1, $2)`, [action, webhook]);
+            await client.query(`INSERT INTO webhooks (id, event_code, post_url, include_info, include_chat, include_contact, include_quoted_message, include_order, include_group_mentions, include_mentions, include_payment, include_reactions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, [
+                webhook.id,
+                webhook.eventCode,
+                webhook.postUrl,
+                webhook.includeInfo,
+                webhook.includeChat,
+                webhook.includeContact,
+                webhook.includeQuotedMessage,
+                webhook.includeOrder,
+                webhook.includeGroupMentions,
+                webhook.includeMentions,
+                webhook.includePayment,
+                webhook.includeReactions,
+            ]);
         } catch (err) {
-            logger.error("Error inserting webhook:", err);
+            logger.error("Error inserting postUrl:", err);
+            throw new Error(`Error inserting postUrl: ${err}`);
         } finally {
             logger.info("Webhook inserted");
         }
@@ -44,7 +57,8 @@ class DbClient {
         try {
             await client.query(`DELETE FROM webhooks WHERE id = $1`, [id]);
         } catch (err) {
-            logger.error("Error removing webhook:", err);
+            logger.error("Error removing postUrl:", err);
+            throw new Error(`Error removing postUrl: ${err}`);
         } finally {
             logger.info("Webhook removed");
         }
@@ -60,14 +74,11 @@ class DbClient {
         try {
             const res = await client.query(`SELECT * FROM webhooks`);
             res.rows.forEach((row: Webhook) => {
-                webhooks.push({
-                    id: row.id,
-                    action: row.action,
-                    webhook: row.webhook
-                });
+                webhooks.push(row);
             });
         } catch (err) {
             logger.error("Error fetching webhooks:", err);
+            throw new Error(`Error fetching webhooks: ${err}`);
         } finally {
             logger.info("All webhooks fetched");
         }
@@ -76,25 +87,22 @@ class DbClient {
     }
 
     /**
-     * Fetches webhooks from the database filtered by action.
-     * @param {string} action - The action to filter webhooks by.
+     * Fetches webhooks from the database filtered by eventCode.
+     * @param {string} eventCode - The eventCode to filter webhooks by.
      */
-    public async fetchWebhooks(action: string): Promise<Webhook[]> {
+    public async fetchWebhooks(eventCode: string): Promise<Webhook[]> {
         const webhooks: Webhook[] = [];
         const client = await this.NewClient();
         try {
-            const res = await client.query(`SELECT * FROM webhooks WHERE action = $1`, [action]);
+            const res = await client.query(`SELECT * FROM webhooks WHERE event_code = $1`, [eventCode]);
             res.rows.forEach((row: Webhook) => {
-                webhooks.push({
-                    id: row.id,
-                    action: row.action,
-                    webhook: row.webhook
-                });
+                webhooks.push(row);
             });
         } catch (err) {
             logger.error("Error fetching webhooks:", err);
+            throw new Error(`Error fetching webhooks: ${err}`);
         } finally {
-            logger.info(`Webhooks fetched for ${action}`);
+            logger.info(`Webhooks fetched for ${eventCode}`);
         }
         await client.end();
         return webhooks;
@@ -107,11 +115,27 @@ class DbClient {
     private async createWebhookTable() {
         const client = await this.NewClient();
         try {
-            await client.query(`CREATE TABLE IF NOT EXISTS webhooks (id SERIAL PRIMARY KEY, action TEXT, webhook TEXT)`);
+            await client.query(`
+            CREATE TABLE IF NOT EXISTS webhooks (
+                id SERIAL PRIMARY KEY,
+                event_code TEXT,
+                post_url TEXT,
+                include_info BOOLEAN DEFAULT FALSE,
+                include_chat BOOLEAN DEFAULT FALSE,
+                include_contact BOOLEAN DEFAULT FALSE,
+                include_quoted_message BOOLEAN DEFAULT FALSE,
+                include_order BOOLEAN DEFAULT FALSE,
+                include_group_mentions BOOLEAN DEFAULT FALSE,
+                include_mentions BOOLEAN DEFAULT FALSE,
+                include_payment BOOLEAN DEFAULT FALSE,
+                include_reactions BOOLEAN DEFAULT FALSE
+            );
+        `);
         } catch (err) {
-            logger.error("Error recreating webhook table:", err);
+            logger.error("Error recreating webhooks table:", err);
+            throw new Error(`Error recreating webhooks table: ${err}`);
         } finally {
-            logger.info("Webhook table recreated");
+            logger.info("Webhooks table recreated");
         }
         await client.end();
     }

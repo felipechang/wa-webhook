@@ -11,43 +11,28 @@ const dbClient = new DbClient();
 const waClient = new WaClient();
 
 // Listen for incoming WhatsApp events and post them to the webhooks
-waClient.onOutgoingListeners(async (action, message: Message) => {
+waClient.onOutgoingListeners(async (eventCode, message: Message) => {
     if (message.from === "status@broadcast") return;
-    const webhooks = await dbClient.fetchWebhooks(action);
-    webhooks.map(((webhook) => postWebhook(message, webhook.webhook)));
+    const webhooks = await dbClient.fetchWebhooks(eventCode);
+    webhooks.map(((webhook) => postWebhook(message, webhook)));
 });
 
 const webClient = new WebClient();
 
-// Send incoming message to WhatsApp and return json
-webClient.onIncomingMessage(waClient);
-
-// Send incoming message to WhatsApp and return component message
-webClient.onIncomingMessageComponent(waClient);
-
-// Store new hook in database and return json
-webClient.onHookAdd(dbClient);
-
-// Store new hook in database and return component list of webhooks
-webClient.onHookAddComponent(dbClient);
-
-// Look for hooks in database and return json
-webClient.onHookGet(dbClient);
-
-// Look for hooks in database and return component list of webhooks
-webClient.onHookGetComponent(dbClient);
-
-// Remove hook from database and return json
-webClient.onHookRemove(dbClient);
-
-// Remove hook from database and return component list of webhooks
-webClient.onHookRemoveComponent(dbClient);
-
-// Send incoming message to WhatsApp and return json
+webClient.onEventOptionsComponent();
+webClient.onGetContactById(waClient);
+webClient.onGetContacts(waClient);
+webClient.onGetGroups(waClient);
 webClient.onGetReadyStatus(waClient);
-
-// Send incoming message to WhatsApp and return component
 webClient.onGetReadyStatusComponent(waClient);
+webClient.onHookAdd(dbClient);
+webClient.onHookAddComponent(dbClient);
+webClient.onHookGet(dbClient);
+webClient.onHookGetComponent(dbClient);
+webClient.onHookRemove(dbClient);
+webClient.onHookRemoveComponent(dbClient);
+webClient.onIncomingMessage(waClient);
+webClient.onIncomingMessageComponent(waClient);
 
 (async function () {
     // Boot database client

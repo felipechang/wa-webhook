@@ -9,7 +9,6 @@ import {Buffer} from "node:buffer";
 import QRCode from "qrcode";
 import bodyParser from "body-parser";
 
-
 /**
  * The WebClient class.
  */
@@ -30,54 +29,185 @@ class WebClient {
         this.app.use(express.static("static"))
     }
 
+    private static makeHook(hook: Webhook): Webhook {
+        return {
+            id: hook.id || "",
+            eventCode: hook.eventCode || "",
+            postUrl: hook.postUrl || "",
+            includeChat: hook.includeChat || false,
+            includeContact: hook.includeContact || false,
+            includeGroupMentions: hook.includeGroupMentions || false,
+            includeInfo: hook.includeInfo || false,
+            includeMentions: hook.includeMentions || false,
+            includeOrder: hook.includeOrder || false,
+            includePayment: hook.includePayment || false,
+            includeQuotedMessage: hook.includeQuotedMessage || false,
+            includeReactions: hook.includeReactions || false
+        }
+    }
+
     /**
      * Boots the web client by starting the Express.js application.
      */
-    public boot() {
+    public boot(): void {
         this.app.listen(5000);
         logger.info("Server started on http://localhost:5000");
     }
 
     /**
-     * Handles incoming messages from WhatsApp.
-     * @param waClient The WhatsApp client.
+     * Returns a list of event options for the WhatsApp Webhook.
      */
-    public onIncomingMessage(waClient: WaClient) {
-        this.app.post("/api/message", async (req: Request<MessageBody>, res: Response) => {
-            if (!req.body || !req.body.from || !req.body.message) {
-                res.status(400).json({error: "Invalid request body"});
-                return;
+    public onEventOptionsComponent(): void {
+        this.app.get("/component/event-options", async (_: Request<Webhook>, res: Response) => {
+            const events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
+            const selectOptions = [
+                `<select class="select select-bordered w-full max-w-xs" id="eventCode" name="eventCode">`
+            ];
+            for (let i = 0; i < events.length; i++) {
+                switch (events[i]) {
+                    case "auth_failure":
+                        selectOptions.push(`<option value="auth_failure">Auth Failure</option>`);
+                        break;
+                    case "authenticated":
+                        selectOptions.push(`<option value="authenticated">Authenticated</option>`);
+                        break;
+                    case "change_battery":
+                        selectOptions.push(`<option value="change_battery">Change Battery</option>`);
+                        break;
+                    case "change_state":
+                        selectOptions.push(`<option value="change_state">Change State</option>`);
+                        break;
+                    case "disconnected":
+                        selectOptions.push(`<option value="disconnected">Disconnected</option>`);
+                        break;
+                    case "group_join":
+                        selectOptions.push(`<option value="group_join">Group Join</option>`);
+                        break;
+                    case "group_leave":
+                        selectOptions.push(`<option value="group_leave">Group Leave</option>`);
+                        break;
+                    case "group_admin_changed":
+                        selectOptions.push(`<option value="group_admin_changed">Group Admin Changed</option>`);
+                        break;
+                    case "group_membership_request":
+                        selectOptions.push(`<option value="group_membership_request">Group Membership Request</option>`);
+                        break;
+                    case "group_update":
+                        selectOptions.push(`<option value="group_update">Group Update</option>`);
+                        break;
+                    case "contact_changed":
+                        selectOptions.push(`<option value="contact_changed">Contact Changed</option>`);
+                        break;
+                    case "media_uploaded":
+                        selectOptions.push(`<option value="media_uploaded">Media Uploaded</option>`);
+                        break;
+                    case "message":
+                        selectOptions.push(`<option value="message">Message Received</option>`);
+                        break;
+                    case "message_ack":
+                        selectOptions.push(`<option value="message_ack">Message Ack</option>`);
+                        break;
+                    case "message_edit":
+                        selectOptions.push(`<option value="message_edit">Message Edited</option>`);
+                        break;
+                    case "unread_count":
+                        selectOptions.push(`<option value="unread_count">Unread Count Changed</option>`);
+                        break;
+                    case "message_create":
+                        selectOptions.push(`<option value="message_create">Message Created</option>`);
+                        break;
+                    case "message_ciphertext":
+                        selectOptions.push(`<option value="message_ciphertext">Message Ciphertext Received</option>`);
+                        break;
+                    case "message_revoke_everyone":
+                        selectOptions.push(`<option value="message_revoke_everyone">Message Revoked for Everyone</option>`);
+                        break;
+                    case "message_revoke_me":
+                        selectOptions.push(`<option value="message_revoke_me">Message Revoked by Me</option>`);
+                        break;
+                    case "message_reeventCode":
+                        selectOptions.push(`<option value="message_reeventCode">Message ReeventCode</option>`);
+                        break;
+                    case "chat_removed":
+                        selectOptions.push(`<option value="chat_removed">Chat Removed</option>`);
+                        break;
+                    case "chat_archived":
+                        selectOptions.push(`<option value="chat_archived">Chat Archived/Unarchived</option>`);
+                        break;
+                    case "loading_screen":
+                        selectOptions.push(`<option value="loading_screen">Loading Screen Appearing</option>`);
+                        break;
+                    case "call":
+                        selectOptions.push(`<option value="call">Call Received</option>`);
+                        break;
+                    case "remote_session_saved":
+                        selectOptions.push(`<option value="remote_session_saved">Remote Session Saved</option>`);
+                        break;
+                    case "vote_update":
+                        selectOptions.push(`<option value="vote_update">Vote Update</option>`);
+                        break;
+                }
             }
-            logger.info(`Received message from ${req.body.from}: ${req.body.message}`);
-            const sent = await waClient.sendMessage(req.body.from, req.body.message);
-            res.json({sent});
+            selectOptions.push(`</select>`)
+            res.send(Buffer.from(selectOptions.join()));
         });
     }
 
     /**
-     * Handles incoming messages from WhatsApp (component version).
+     * Returns a contact by ID.
+     *
      * @param waClient The WhatsApp client.
      */
-    public onIncomingMessageComponent(waClient: WaClient) {
-        this.app.post("/component/message-control", async (req: Request<MessageBody>, res: Response) => {
-            if (!req.body) {
-                res.send(Buffer.from(this.alertComponent("alert-warning", "Request body is missing")));
+    public onGetContactById(waClient: WaClient): void {
+        this.app.get("/api/contact/:id", async (req: Request, res: Response) => {
+            if (!req.params || !req.params.id) {
+                res.status(400).json({error: "Parameter id is missing"});
                 return;
             }
-            if (!req.body.from) {
-                res.send(Buffer.from(this.alertComponent("alert-warning", "Form field is required")));
-                return;
+            try {
+                res.set("Content-Type", "text/html");
+                const contact = await waClient.getContactById(req.params.id);
+                res.json(contact);
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
             }
-            if (!req.body.message) {
-                res.send(Buffer.from(this.alertComponent("alert-warning", "Message field is required")));
-                return;
+        });
+    }
+
+    /**
+     * Returns a list of contacts.
+     *
+     * @param waClient The WhatsApp client.
+     */
+    public onGetContacts(waClient: WaClient): void {
+        this.app.get("/api/contact", async (_: Request, res: Response) => {
+            try {
+                res.set("Content-Type", "text/html");
+                const contact = await waClient.getContacts();
+                res.json(contact);
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
             }
-            logger.info(`Received message from ${req.body.from}: ${req.body.message}`);
-            const sent = await waClient.sendMessage(req.body.from, req.body.message);
-            res.send(Buffer.from(sent ?
-                this.alertComponent("alert-success", "Message sent") :
-                this.alertComponent("alert-error", "Client is not ready")
-            ));
+        });
+    }
+
+    /**
+     * Returns a list of group chats.
+     *
+     * @param waClient The WhatsApp client.
+     */
+    public onGetGroups(waClient: WaClient): void {
+        this.app.get("/api/groups", async (_: Request, res: Response) => {
+            try {
+                res.set("Content-Type", "text/html");
+                const chatGroups = await waClient.getGroups();
+                res.json(chatGroups);
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
         });
     }
 
@@ -85,11 +215,16 @@ class WebClient {
      * Returns the status of the WhatsApp client.
      * @param waClient The WhatsApp client.
      */
-    public onGetReadyStatus(waClient: WaClient) {
-        this.app.get("/api/status", (_: Request, res: Response) => {
-            res.set("Content-Type", "text/html");
-            const readyStatus = waClient.getReadyStatus();
-            res.json(readyStatus);
+    public onGetReadyStatus(waClient: WaClient): void {
+        this.app.get("/api/status", async (_: Request, res: Response) => {
+            try {
+                res.set("Content-Type", "text/html");
+                const readyStatus = await waClient.getReadyStatus();
+                res.json(readyStatus);
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
         });
     }
 
@@ -100,7 +235,7 @@ class WebClient {
     public onGetReadyStatusComponent(waClient: WaClient) {
         this.app.get("/component/status-control", async (_: Request, res: Response) => {
             res.set("Content-Type", "text/html");
-            const readyStatus = waClient.getReadyStatus();
+            const readyStatus = await waClient.getReadyStatus();
             if (readyStatus.ready) {
                 res.send(Buffer.from(`
                     <h2>WhatsApp Client is Ready</div>
@@ -130,23 +265,29 @@ class WebClient {
      * Adds a webhook to the database.
      * @param dbClient The database client.
      */
-    public onHookAdd(dbClient: DbClient) {
-        this.app.post("/api/webhook", async (req: Request<Webhook>, res: Response) => {
+    public onHookAdd(dbClient: DbClient): void {
+        this.app.post("/api/webhook", async (req: Request<Partial<Webhook>>, res: Response) => {
             if (!req.body) {
                 res.status(400).json({error: "Invalid request body"});
                 return;
             }
-            if (!req.body.action) {
-                res.status(400).json({error: "Invalid request body"});
+            const webhook = WebClient.makeHook(req.body);
+            if (!webhook.eventCode) {
+                res.status(400).json({error: "eventCode is a required parameter"});
                 return;
             }
-            if (!req.body.webhook) {
-                res.status(400).json({error: "Invalid request body"});
+            if (!webhook.postUrl) {
+                res.status(400).json({error: "postUrl is a required parameter"});
                 return;
             }
-            logger.info(`Hook added: action=${req.body.action}, webhook=${req.body.webhook}`);
-            await dbClient.insertWebhook(req.body.action, req.body.webhook);
-            res.json({});
+            try {
+                await dbClient.insertWebhook(webhook);
+                logger.info(`Hook added: eventCode=${webhook.eventCode}, postUrl=${webhook.postUrl}`);
+                res.json({});
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
         });
     }
 
@@ -154,11 +295,17 @@ class WebClient {
      * Adds a webhook to the database (component version).
      * @param dbClient The database client.
      */
-    public onHookAddComponent(dbClient: DbClient) {
+    public onHookAddComponent(dbClient: DbClient): void {
         this.app.post("/component/webhook-control", async (req: Request<Webhook>, res: Response) => {
-            await dbClient.insertWebhook(req.body.action, req.body.webhook);
-            logger.info(`Hook added: action=${req.body.action}, webhook=${req.body.webhook}`);
-            res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+            try {
+                const webhook = WebClient.makeHook(req.body);
+                await dbClient.insertWebhook(webhook);
+                logger.info(`Hook added: eventCode=${webhook.eventCode}, postUrl=${webhook.postUrl}`);
+                res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+            } catch (error) {
+                logger.error(error);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            }
         });
     }
 
@@ -166,9 +313,14 @@ class WebClient {
      * Returns all webhooks.
      * @param dbClient The database client.
      */
-    public onHookGet(dbClient: DbClient) {
+    public onHookGet(dbClient: DbClient): void {
         this.app.get("/api/webhook", async (_: Request<Webhook>, res: Response) => {
-            res.json(await dbClient.fetchAllWebhooks());
+            try {
+                res.json(await dbClient.fetchAllWebhooks());
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
         });
     }
 
@@ -176,9 +328,14 @@ class WebClient {
      * Returns all webhooks (component version).
      * @param dbClient The database client.
      */
-    public onHookGetComponent(dbClient: DbClient) {
+    public onHookGetComponent(dbClient: DbClient): void {
         this.app.get("/component/webhook-control", async (_: Request<Webhook>, res: Response) => {
-            res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+            try {
+                res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+            } catch (error) {
+                logger.error(error);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            }
         });
     }
 
@@ -186,15 +343,20 @@ class WebClient {
      * Removes a webhook from the database.
      * @param dbClient The database client.
      */
-    public onHookRemove(dbClient: DbClient) {
+    public onHookRemove(dbClient: DbClient): void {
         this.app.delete("/api/webhook/:id", async (req: Request<{ id: string }>, res: Response) => {
             if (!req.params || !req.params.id) {
                 res.status(400).json({error: "Parameter id is missing"});
                 return;
             }
-            logger.info(`Hook removed: id=${req.params.id}`);
-            await dbClient.removeWebhook(req.params.id);
-            res.json({});
+            try {
+                logger.info(`Hook removed: id=${req.params.id}`);
+                await dbClient.removeWebhook(req.params.id);
+                res.json({});
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
         });
     }
 
@@ -202,12 +364,65 @@ class WebClient {
      * Removes a webhook from the database (component version).
      * @param dbClient The database client.
      */
-    public onHookRemoveComponent(dbClient: DbClient) {
+    public onHookRemoveComponent(dbClient: DbClient): void {
         this.app.delete("/component/webhook-control/:id", async (req: Request<{ id: string }>, res: Response) => {
-            logger.info(`Hook removed: id=${req.params.id}`);
-            await dbClient.removeWebhook(req.params.id);
-            res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+            try {
+                logger.info(`Hook removed: id=${req.params.id}`);
+                await dbClient.removeWebhook(req.params.id);
+                res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
+            } catch (error) {
+                logger.error(error);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            }
+        });
+    }
 
+    /**
+     * Handles incoming messages from WhatsApp.
+     * @param waClient The WhatsApp client.
+     */
+    public onIncomingMessage(waClient: WaClient): void {
+        this.app.post("/api/message", async (req: Request<MessageBody>, res: Response) => {
+            if (!req.body) {
+                res.status(400).json({error: "Invalid request body"});
+                return;
+            }
+            if (!req.body.from) {
+                res.status(400).json({error: "from is a required parameter"});
+                return;
+            }
+            if (!req.body.message) {
+                res.status(400).json({error: "message is a required parameter"});
+                return;
+            }
+            try {
+                logger.info(`Received message from ${req.body.from}: ${req.body.message}`);
+                const sent = await waClient.sendMessage(req.body.from, req.body.message);
+                res.json({sent});
+            } catch (error) {
+                logger.error(error);
+                res.status(500).json({error: "Internal Server Error"});
+            }
+        });
+    }
+
+    /**
+     * Handles incoming messages from WhatsApp (component version).
+     * @param waClient The WhatsApp client.
+     */
+    public onIncomingMessageComponent(waClient: WaClient): void {
+        this.app.post("/component/message-control", async (req: Request<MessageBody>, res: Response) => {
+            try {
+                logger.info(`Received message from ${req.body.from}: ${req.body.message}`);
+                const sent = await waClient.sendMessage(req.body.from, req.body.message);
+                res.send(Buffer.from(sent ?
+                    this.alertComponent("alert-success", "Message sent") :
+                    this.alertComponent("alert-error", "Client is not ready")
+                ));
+            } catch (error) {
+                logger.error(error);
+                res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            }
         });
     }
 
@@ -246,9 +461,17 @@ class WebClient {
             `<table class="table">`,
             `<thead>`,
             `<tr>`,
-            `    <th>ID</th>`,
-            `    <th>Action</th>`,
-            `    <th>Webhook</th>`,
+            `    <th>Event Code</th>`,
+            `    <th>Webhook URL</th>`,
+            `    <th>Include Info</th>`,
+            `    <th>Include Chat</th>`,
+            `    <th>Include Contact</th>`,
+            `    <th>Include Quoted Message</th>`,
+            `    <th>Include Order</th>`,
+            `    <th>Include Group Mentions</th>`,
+            `    <th>Include Mentions</th>`,
+            `    <th>Include Payment</th>`,
+            `    <th>Include Reactions</th>`,
             `    <th>Remove</th>`,
             `<tr>`,
             `</thead>`,
@@ -258,16 +481,24 @@ class WebClient {
         for (let i = 0; i < webhooks.length; i++) {
             const webhook = webhooks[i];
             nodes.push(`
-            <tr>
-              <th>${webhook.id}</th>
-              <td>${webhook.action}</td>
-              <td>${webhook.webhook}</td>
-              <td>
-                <button hx-delete="/component/webhook-control/${webhook.id}" hx-target="#webhook-response">
-                    <img src="/assets/trash.svg" class="w-6" alt="Remove"/>
-                </button>
-              </td>
-            </tr>`);
+        <tr>
+          <td>${webhook.eventCode}</td>
+          <td>${webhook.postUrl}</td>
+          <td>${webhook.includeInfo ? "✅" : "🚫"}</td>
+          <td>${webhook.includeChat ? "✅" : "🚫"}</td>
+          <td>${webhook.includeContact ? "✅" : "🚫"}</td>
+          <td>${webhook.includeQuotedMessage ? "✅" : "🚫"}</td>
+          <td>${webhook.includeOrder ? "✅" : "🚫"}</td>
+          <td>${webhook.includeGroupMentions ? "✅" : "🚫"}</td>
+          <td>${webhook.includeMentions ? "✅" : "🚫"}</td>
+          <td>${webhook.includePayment ? "✅" : "🚫"}</td>
+          <td>${webhook.includeReactions ? "✅" : "🚫"}</td>
+          <td>
+            <button hx-delete="/component/webhook-control/${webhook.id}" hx-target="#webhook-response">
+               💀
+            </button>
+          </td>
+        </tr>`);
         }
 
         nodes.push(`</tbody>`);

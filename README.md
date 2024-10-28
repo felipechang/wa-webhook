@@ -18,69 +18,73 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 
 ## 📋 API Reference
 
-### Message Operations
+### Contact Management
 
-#### Send Message
+- `GET /api/contact/:id`
+    - Returns contact information for a specific contact ID
+    - Parameters: `id` (path parameter)
 
-```http
-POST /api/message
-```
+- `GET /api/contact`
+    - Returns a list of all contacts
 
-Send WhatsApp messages to specified recipients.
+### Group Management
 
-**Request Body:**
+- `GET /api/groups`
+    - Returns a list of all group chats
 
-```json
-{
-  "from": "recipient_number",
-  "message": "message_content"
-}
-```
+### Status
 
-### Status Management
-
-#### Client Status
-
-```http
-GET /api/status
-```
-
-Check current WhatsApp client connection status.
+- `GET /api/status`
+    - Returns the current status of the WhatsApp client
+    - Response includes ready status and QR code (if not authenticated)
 
 ### Webhook Management
 
-#### Register Webhook
+- `POST /api/webhook`
+    - Creates a new webhook subscription
+    - Required body parameters:
+        - `eventCode`: Type of event to subscribe to
+        - `postUrl`: URL where webhook notifications will be sent
+    - Optional body parameters:
+        - `includeChat`: Include chat information (boolean)
+        - `includeContact`: Include contact information (boolean)
+        - `includeGroupMentions`: Include group mentions (boolean)
+        - `includeInfo`: Include additional info (boolean)
+        - `includeMentions`: Include mentions (boolean)
+        - `includeOrder`: Include order information (boolean)
+        - `includePayment`: Include payment information (boolean)
+        - `includeQuotedMessage`: Include quoted messages (boolean)
+        - `includeReactions`: Include message reactions (boolean)
 
-```http
-POST /api/webhook
-```
+- `GET /api/webhook`
+    - Returns a list of all registered webhooks
 
-Register new webhook endpoints for specific events.
+- `DELETE /api/webhook/:id`
+    - Removes a webhook subscription
+    - Parameters: `id` (path parameter)
 
-**Request Body:**
+### Messaging
+
+- `POST /api/message`
+    - Sends a WhatsApp message
+    - Required body parameters:
+        - `from`: Sender's contact ID
+        - `message`: Message content to send
+
+All endpoints return JSON responses and include appropriate error handling. Error responses will include a status code
+and an error message in the following format:
 
 ```json
 {
-  "action": "event_type",
-  "webhook": "callback_url"
+  "error": "Error message description"
 }
 ```
 
-#### List Webhooks
+Common HTTP status codes:
 
-```http
-GET /api/webhook
-```
-
-Retrieve all registered webhooks.
-
-#### Remove Webhook
-
-```http
-DELETE /api/webhook/:id
-```
-
-Remove a specific webhook by ID.
+- 200: Successful operation
+- 400: Bad request (missing or invalid parameters)
+- 500: Internal server error
 
 ## 🔧 Installation
 

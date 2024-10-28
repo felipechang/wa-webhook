@@ -12,21 +12,13 @@ class WaClient {
     private client: wa.Client;
 
     /**
-     * Whether the client is ready.
-     * @private
-     */
-    private ready = false;
-
-    /**
      * The events to listen for.
      * @private
      */
-    private events = [
-        "message_create"
-    ];
+    private events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
 
     /**
-     * Devide link QR code.
+     * Device link QR code.
      * @private
      */
     private qr = "";
@@ -39,7 +31,7 @@ class WaClient {
             authStrategy: new wa.LocalAuth(),
             puppeteer: {
                 executablePath: "/usr/bin/google-chrome",
-                args: ["--no-sandbox"]
+                args: ["--no-sandbox", "--disable-setuid-sandbox"]
             }
         });
     }
@@ -48,39 +40,130 @@ class WaClient {
      * Boots the WhatsApp Web client.
      */
     public async boot() {
+
         this.client.on("qr", (qr: string) => {
             this.qr = qr;
             logger.info("QR code generated");
         });
 
-        this.client.on("ready", () => {
-            this.ready = true;
+        this.client.on("ready", async () => {
             this.qr = "";
-            logger.info("WhatsApp client is ready");
+            const state = await this.client.getState();
+            logger.info(`WhatsApp client is ready with state ${state}`);
         });
 
         await this.client.initialize();
     }
 
     /**
-     * Listens for outgoing messages and calls the callback function.
-     * @param {function} callback - The callback function to call with the outgoing message.
+     * Retrieves a contact by its ID.
+     *
+     * @param {string} contactId The ID of the contact to retrieve.
+     * @returns {Promise<ChatContact>} A promise that resolves to the contact with the given ID.
      */
-    public onOutgoingListeners(callback: (action: string, message: wa.Message) => void) {
-        this.events.map((action: string): void => {
-            this.client.on(action, (message: Message) => callback(action, message));
+    public async getContactById(contactId: string): Promise<ChatContact> {
+        const state = await this.client.getState();
+        if (state != "CONNECTED") throw new Error("Client is not ready");
+        const contact = await this.client.getContactById(contactId);
+        return {
+            id: contact.id._serialized,
+            isBlocked: contact.isBlocked,
+            isBusiness: contact.isBusiness,
+            isEnterprise: contact.isEnterprise,
+            isGroup: contact.isGroup,
+            isMe: contact.isMe,
+            isMyContact: contact.isMyContact,
+            isUser: contact.isUser,
+            isWAContact: contact.isWAContact,
+            labels: contact.labels,
+            name: contact.name,
+            number: contact.number,
+            pushname: contact.pushname,
+            sectionHeader: contact.sectionHeader,
+            shortName: contact.shortName,
+            statusMute: contact.statusMute,
+            type: contact.type,
+            verifiedLevel: contact.verifiedLevel,
+            verifiedName: contact.verifiedName
+        }
+    }
+
+
+    public async getContacts(): Promise<ChatContact[]> {
+        const state = await this.client.getState();
+        if (state != "CONNECTED") throw new Error("Client is not ready");
+        const chats = await this.client.getContacts();
+        return chats.map(contact => {
+            return {
+                id: contact.id._serialized,
+                isBlocked: contact.isBlocked,
+                isBusiness: contact.isBusiness,
+                isEnterprise: contact.isEnterprise,
+                isGroup: contact.isGroup,
+                isMe: contact.isMe,
+                isMyContact: contact.isMyContact,
+                isUser: contact.isUser,
+                isWAContact: contact.isWAContact,
+                labels: contact.labels,
+                name: contact.name,
+                number: contact.number,
+                pushname: contact.pushname,
+                sectionHeader: contact.sectionHeader,
+                shortName: contact.shortName,
+                statusMute: contact.statusMute,
+                type: contact.type,
+                verifiedLevel: contact.verifiedLevel,
+                verifiedName: contact.verifiedName
+            }
         });
+    }
+
+    /**
+     * Retrieves a list of chat groups.
+     *
+     * @returns {Promise<ChatGroup[]>} A promise that resolves to an array of chat groups.
+     */
+    public async getGroups(): Promise<ChatGroup[]> {
+        const state = await this.client.getState();
+        if (state != "CONNECTED") throw new Error("Client is not ready");
+        const chats = await this.client.getChats();
+        return chats
+            .filter(chat => chat.isGroup)
+            .map(chat => {
+                return {
+                    id: chat.id._serialized,
+                    name: chat.name,
+                    archived: chat.archived,
+                    isReadOnly: chat.isReadOnly,
+                    isMuted: chat.isMuted,
+                    muteExpiration: chat.muteExpiration,
+                    timestamp: chat.timestamp,
+                    unreadCount: chat.unreadCount,
+                    pinned: chat.pinned
+                } as ChatGroup
+            });
     }
 
     /**
      * Gets the ready status of the client.
      * @returns {ReadyStatus} The ready status of the client.
      */
-    public getReadyStatus(): ReadyStatus {
+    public async getReadyStatus(): Promise<ReadyStatus> {
+        const state = await this.client.getState();
         return {
             qr: this.qr,
-            ready: this.ready
+            ready: state != "CONNECTED"
         };
+    }
+
+    /**
+     * Listens for outgoing messages and calls the callback function.
+     * @param {function} callback - The callback function to call with the outgoing message.
+     */
+    public onOutgoingListeners(callback: (eventCode: string, message: wa.Message) => void) {
+        this.events.map((eventCode: string): void => {
+            this.client.on(eventCode, (message: Message) => callback(eventCode, message));
+        });
     }
 
     /**
@@ -90,10 +173,8 @@ class WaClient {
      * @returns {Promise<boolean>}
      */
     public async sendMessage(from: string, message: string): Promise<boolean> {
-        if (!this.ready) {
-            logger.info("Failed to send message. Client is not ready");
-            return false;
-        }
+        const state = await this.client.getState();
+        if (state != "CONNECTED") throw new Error("Client is not ready");
         await this.client.sendMessage(from, message);
         logger.info("Message sent");
         return true;

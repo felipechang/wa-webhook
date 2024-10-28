@@ -6,45 +6,74 @@
         <h1 class="text-3xl">Create:</h1>
         <form class="flex flex-col gap-2 items-end" hx-post="/component/webhook-control" hx-target="#webhook-response"
               hx-validate>
-            <label class="form-control w-full max-w-xs" for="action">
+            <label class="form-control w-full max-w-xs" for="eventCode">
                 <div class="label">
-                    <span class="label-text">Action:</span>
+                    <span class="label-text">Event Code:</span>
                 </div>
-                <select class="select select-bordered w-full max-w-xs" id="action" name="action">
-                    <option value="auth_failure">Auth Failure</option>
-                    <option value="authenticated">Authenticated</option>
-                    <option value="change_battery">Change Battery</option>
-                    <option value="change_state">Change State</option>
-                    <option value="disconnected">Disconnected</option>
-                    <option value="group_join">Group Join</option>
-                    <option value="group_leave">Group Leave</option>
-                    <option value="group_admin_changed">Group Admin Changed</option>
-                    <option value="group_membership_request">Group Membership Request</option>
-                    <option value="group_update">Group Update</option>
-                    <option value="contact_changed">Contact Changed</option>
-                    <option value="media_uploaded">Media Uploaded</option>
-                    <option value="message">Message Received</option>
-                    <option value="message_ack">Message Ack</option>
-                    <option value="message_edit">Message Edited</option>
-                    <option value="unread_count">Unread Count Changed</option>
-                    <option value="message_create">Message Created</option>
-                    <option value="message_ciphertext">Message Ciphertext Received</option>
-                    <option value="message_revoke_everyone">Message Revoked for Everyone</option>
-                    <option value="message_revoke_me">Message Revoked by Me</option>
-                    <option value="message_reaction">Message Reaction</option>
-                    <option value="chat_removed">Chat Removed</option>
-                    <option value="chat_archived">Chat Archived/Unarchived</option>
-                    <option value="loading_screen">Loading Screen Appearing</option>
-                    <option value="call">Call Received</option>
-                    <option value="remote_session_saved">Remote Session Saved</option>
-                    <option value="vote_update">Vote Update</option>
+                <select class="select select-bordered w-full max-w-xs" id="eventCode" name="eventCode" hx-get="/component/event-options" hx-trigger="load">
                 </select>
             </label>
-            <label class="form-control w-full max-w-xs" for="webhook">
+            <label class="form-control w-full max-w-xs" for="postUrl">
                 <div class="label">
-                    <span class="label-text">Webhook:</span>
+                    <span class="label-text">Webhook URL:</span>
                 </div>
-                <input class="input input-bordered" id="webhook" minlength="3" name="webhook" required type="url"/>
+                <input class="checkbox" id="postUrl" minlength="3" name="postUrl" required type="url"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeInfo">
+                <div class="label">
+                    <span class="label-text">Include Info:</span>
+                </div>
+                <input class="checkbox" id="includeInfo" name="includeInfo" type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeChat">
+                <div class="label">
+                    <span class="label-text">Include Chat:</span>
+                </div>
+                <input class="checkbox" id="includeChat" name="includeChat" type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeContact">
+                <div class="label">
+                    <span class="label-text">Include Contact:</span>
+                </div>
+                <input class="checkbox" id="includeContact" name="includeContact" type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeQuotedMessage">
+                <div class="label">
+                    <span class="label-text">Include Quoted Message:</span>
+                </div>
+                <input class="checkbox" id="includeQuotedMessage" name="includeQuotedMessage"
+                       type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeOrder">
+                <div class="label">
+                    <span class="label-text">Include Order:</span>
+                </div>
+                <input class="checkbox" id="includeOrder" name="includeOrder" type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeGroupMentions">
+                <div class="label">
+                    <span class="label-text">Include Group Mentions:</span>
+                </div>
+                <input class="checkbox" id="includeGroupMentions" name="includeGroupMentions"
+                       type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeMentions">
+                <div class="label">
+                    <span class="label-text">Include Mentions:</span>
+                </div>
+                <input class="checkbox" id="includeMentions" name="includeMentions" type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includePayment">
+                <div class="label">
+                    <span class="label-text">Include Payment:</span>
+                </div>
+                <input class="checkbox" id="includePayment" name="includePayment" type="checkbox"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="includeReactions">
+                <div class="label">
+                    <span class="label-text">Include Reactions:</span>
+                </div>
+                <input class="checkbox" id="includeReactions" name="includeReactions" type="checkbox"/>
             </label>
             <input class="btn btn-primary mt-6 w-full" type="submit" value="Add Hook">
         </form>
