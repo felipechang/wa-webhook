@@ -58,6 +58,13 @@ interface Webhook {
     event_code: string;
 
     /**
+     * Comma separated list of webhook request headers (Basic c2VjcmV0Cg==,Foo Bar).
+     * @memberof Webhook
+     * @type {string}
+     */
+    auth_header: string;
+
+    /**
      * The webhook URL.
      * @memberof Webhook
      * @type {string}

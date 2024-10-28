@@ -33,6 +33,7 @@ class WebClient {
         return {
             id: hook.id || "",
             event_code: hook.event_code || "",
+            auth_header: hook.auth_header || "",
             post_url: hook.post_url || "",
             include_chat: hook.include_chat === "on",
             include_contact: hook.include_contact === "on",
@@ -159,6 +160,11 @@ class WebClient {
      */
     public onGetContactById(waClient: WaClient): void {
         this.app.get("/api/contact/:id", async (req: Request, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             if (!req.params || !req.params.id) {
                 res.status(400).json({error: "Parameter id is missing"});
                 return;
@@ -181,7 +187,12 @@ class WebClient {
      * @param waClient The WhatsApp client.
      */
     public onGetContacts(waClient: WaClient): void {
-        this.app.get("/api/contact", async (_: Request, res: Response) => {
+        this.app.get("/api/contact", async (req: Request, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             try {
                 const contact = await waClient.getContacts();
                 res.json(contact);
@@ -238,7 +249,12 @@ class WebClient {
      * @param waClient The WhatsApp client.
      */
     public onGetGroups(waClient: WaClient): void {
-        this.app.get("/api/groups", async (_: Request, res: Response) => {
+        this.app.get("/api/groups", async (req: Request, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             try {
                 const chatGroups = await waClient.getGroups();
                 res.json(chatGroups);
@@ -256,7 +272,12 @@ class WebClient {
      * @param waClient The WhatsApp client.
      */
     public onGetReadyStatus(waClient: WaClient): void {
-        this.app.get("/api/status", async (_: Request, res: Response) => {
+        this.app.get("/api/status", async (req: Request, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             try {
                 const readyStatus = await waClient.getReadyStatus();
                 res.json(readyStatus);
@@ -310,6 +331,11 @@ class WebClient {
      */
     public onHookAdd(dbClient: DbClient): void {
         this.app.post("/api/webhook", async (req: Request<Partial<Webhook>>, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             if (!req.body) {
                 res.status(400).json({error: "Invalid request body"});
                 return;
@@ -360,7 +386,12 @@ class WebClient {
      * @param dbClient The database client.
      */
     public onHookGet(dbClient: DbClient): void {
-        this.app.get("/api/webhook", async (_: Request<Webhook>, res: Response) => {
+        this.app.get("/api/webhook", async (req: Request<Webhook>, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             try {
                 res.json(await dbClient.fetchAllWebhooks());
             } catch (error: any) {
@@ -396,6 +427,11 @@ class WebClient {
      */
     public onHookRemove(dbClient: DbClient): void {
         this.app.delete("/api/webhook/:id", async (req: Request<{ id: string }>, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             if (!req.params || !req.params.id) {
                 res.status(400).json({error: "Parameter id is missing"});
                 return;
@@ -437,6 +473,11 @@ class WebClient {
      */
     public onIncomingMessage(waClient: WaClient): void {
         this.app.post("/api/message", async (req: Request<MessageBody>, res: Response) => {
+            const error = this.validateHeaderKey(req);
+            if (error) {
+                res.status(401).json({error});
+                return;
+            }
             if (!req.body) {
                 res.status(400).json({error: "Invalid request body"});
                 return;
@@ -518,6 +559,7 @@ class WebClient {
             `    <th></th>`,
             `    <th>Event</th>`,
             `    <th>URL</th>`,
+            `    <th>Header</th>`,
             `    <th>➕ Info</th>`,
             `    <th>➕ Chat</th>`,
             `    <th>➕ Contact</th>`,
@@ -543,6 +585,7 @@ class WebClient {
           </td>
           <td>${webhook.event_code}</td>
           <td>${webhook.post_url}</td>
+          <td>${webhook.auth_header}</td>
           <td>${webhook.include_info ? "✅" : "🚫"}</td>
           <td>${webhook.include_chat ? "✅" : "🚫"}</td>
           <td>${webhook.include_contact ? "✅" : "🚫"}</td>
@@ -559,6 +602,28 @@ class WebClient {
         nodes.push(`</table>`);
         nodes.push(`</div>`);
         return nodes.join("");
+    }
+
+    /**
+     * Validates the API key in the request header.
+     *
+     * @param {Request<any>} req The HTTP request object.
+     * @returns {string} An error message if the API key is invalid or missing, otherwise an empty string.
+     * @private
+     */
+    private validateHeaderKey(req: Request<any>): string {
+        if (!req.headers || !req.headers['X-API-Key']) {
+            return "Missing API key header";
+        }
+        const headerKey = req.headers['X-API-Key'];
+        const apiKey = typeof headerKey === "string" ? headerKey : headerKey[0];
+        if (!apiKey) {
+            return "Missing API key";
+        }
+        if (apiKey !== process.env.WA_WEBHOOK_API_AUTH) {
+            return "Invalid API key";
+        }
+        return "";
     }
 }
 

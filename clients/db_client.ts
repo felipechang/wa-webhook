@@ -29,6 +29,7 @@ class DbClient {
               INSERT INTO webhooks (
                 event_code,
                 post_url,
+                auth_header,
                 include_info,
                 include_chat,
                 include_contact,
@@ -39,11 +40,12 @@ class DbClient {
                 include_payment,
                 include_reactions
               ) VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
               )`,
                 [
                     webhook.event_code,
                     webhook.post_url,
+                    webhook.auth_header,
                     webhook.include_info,
                     webhook.include_chat,
                     webhook.include_contact,
@@ -131,6 +133,7 @@ class DbClient {
                 id SERIAL PRIMARY KEY,
                 event_code TEXT,
                 post_url TEXT,
+                auth_header TEXT,
                 include_info BOOLEAN DEFAULT FALSE,
                 include_chat BOOLEAN DEFAULT FALSE,
                 include_contact BOOLEAN DEFAULT FALSE,

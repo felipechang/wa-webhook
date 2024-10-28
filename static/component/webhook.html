@@ -2,7 +2,7 @@
     <div class="text-3xl mx-auto">Manage Webhooks</div>
 </div>
 <div class="flex flex-row">
-    <div class="w-1/4 flex flex-col items-center">
+    <div class="px-8 w-72 flex flex-col items-center">
         <form class="flex flex-col gap-2 items-end" hx-post="/component/webhook-control" hx-target="#webhook-response"
               hx-validate>
             <label class="form-control w-full max-w-xs" for="event_code">
@@ -27,6 +27,12 @@
                 </div>
                 <input class="input input-bordered w-full max-w-xs" id="post_url" minlength="3" name="post_url" required
                        type="url"/>
+            </label>
+            <label class="form-control w-full max-w-xs" for="auth_header">
+                <div class="label">
+                    <span class="label-text">Webhook Headers</span>
+                </div>
+                <input class="input input-bordered w-full max-w-xs" id="auth_header" name="auth_header" type="text"/>
             </label>
             <label class="form-control flex-row w-full max-w-xs" for="include_info">
                 <input class="checkbox mt-2 mr-1" id="include_info" name="include_info" type="checkbox"/>
@@ -87,7 +93,7 @@
             <input class="btn btn-primary mt-6 w-full" type="submit" value="Create">
         </form>
     </div>
-    <div class="w-3/4">
+    <div class="">
         <form hx-get="/component/webhook-control" hx-target="#webhook-response" hx-trigger="load">
         </form>
         <div id="webhook-response"></div>

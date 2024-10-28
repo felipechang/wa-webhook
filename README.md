@@ -46,6 +46,7 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
         - `event_code`: Type of event to subscribe to
         - `post_url`: URL where webhook notifications will be sent
     - Optional body parameters:
+        - `auth_header`: Comma separated list of webhook request headers (Basic c2VjcmV0Cg==,Foo Bar)
         - `include_chat`: Include chat information (boolean)
         - `include_contact`: Include contact information (boolean)
         - `include_group_mentions`: Include group mentions (boolean)
@@ -71,6 +72,23 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
         - `recipient`: Recipient's contact ID
         - `message`: Message content to send
 
+**Authentication**
+
+All API endpoints require the `X-Api-Key` header to be set to a valid API key. You can obtain an API key by setting
+the `WA_WEBHOOK_API_AUTH` environment variable.
+
+Example:
+
+```bash
+export WA_WEBHOOK_API_AUTH=xvB9e290C9TuZ02HiyAAXzxvTvmT
+```
+
+You can also set the API key in your request headers:
+
+```bash
+X-Api-Key: xvB9e290C9TuZ02HiyAAXzxvTvmT
+```
+
 All endpoints return JSON responses and include appropriate error handling. Error responses will include a status code
 and an error message in the following format:
 
@@ -83,6 +101,7 @@ and an error message in the following format:
 Common HTTP status codes:
 
 - 200: Successful operation
+- 401: Invalid or missing X-Api-Key
 - 400: Bad request (missing or invalid parameters)
 - 500: Internal server error
 

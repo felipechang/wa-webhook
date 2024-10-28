@@ -1,4 +1,5 @@
 import {Message} from "whatsapp-web.js";
+import {logger} from "./logger.js";
 
 /**
  * postWebhook function for posting a message to a webhook.
@@ -9,9 +10,14 @@ import {Message} from "whatsapp-web.js";
  */
 export const postWebhook = async (eventCode: string, webhook: Webhook, message: Message | undefined): Promise<void> => {
     try {
+        const headers: { [key: string]: string } = {"Content-Type": "application/json"};
+        webhook.auth_header.split(",").map((e) => {
+            const [key, value] = e.split(" ");
+            if (key && value) headers[`${key}`] = value;
+        });
         const response = await fetch(webhook.post_url, {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers,
             body: JSON.stringify(message ? {
                 eventCode,
                 message: message.rawData,
@@ -30,9 +36,10 @@ export const postWebhook = async (eventCode: string, webhook: Webhook, message: 
             })
         });
         if (!response.ok) {
-            console.error(`Error posting to webhook: ${webhook}`);
+            const {code, message, hint} = await response.json() as any;
+            logger.error(`🌐: issue posting webhook: code=${code} message=${message} hint=${hint}`);
         }
-    } catch (error) {
-        console.error(`Error posting to webhook: ${error}`);
+    } catch (error: any) {
+        logger.error(`🌐: error posting webhook: ${error?.message}`);
     }
 };
