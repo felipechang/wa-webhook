@@ -22,20 +22,17 @@ RUN apt-get update &&  \
     apt-get install google-chrome-stable -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Create application directory
-RUN mkdir -p /home/api/src
-
 # Create non-root user for security
 RUN useradd -ms /bin/bash api
+
+# Create application directory
+RUN mkdir -p /home/api/src
 
 # Set working directory
 WORKDIR /home/api/src
 
 # Copy application files to container
 COPY . .
-
-# Remove existing node_modules (if any) to ensure clean installation
-RUN rm -R node_modules
 
 # Change ownership of application files to non-root user
 RUN chown -R api:api /home/api
