@@ -50,13 +50,13 @@ class WaClient {
 
         this.client.on("qr", (qr: string) => {
             this.qr = qr;
-            logger.info("QR code generated");
+            logger.info("📱: QR code generated");
         });
 
         this.client.on("ready", async () => {
             this.qr = "";
             this.ready = true;
-            logger.info(`WhatsApp client is ready`);
+            logger.info(`📱: client is ready`);
         });
 
         await this.client.initialize();
@@ -178,7 +178,7 @@ class WaClient {
     public async sendMessage(from: string, message: string): Promise<boolean> {
         if (!this.ready) throw new Error("Client is not ready");
         await this.client.sendMessage(from, message);
-        logger.info("Message sent");
+        logger.info("📱: message sent");
         return true;
     }
 }

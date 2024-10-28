@@ -6,15 +6,20 @@ import WaClient from "./clients/wa_client.ts";
 import WebClient from "./clients/web_client.ts";
 import {postWebhook} from "./pkg/hook.ts";
 import {Message} from "whatsapp-web.js";
+import {logger} from "./pkg/logger.js";
 
 const dbClient = new DbClient();
 const waClient = new WaClient();
 
 // Listen for incoming WhatsApp events and post them to the webhooks
 waClient.onOutgoingListeners(async (eventCode, message: Message) => {
-    if (message.from === "status@broadcast") return;
+    if (message && message.from === "status@broadcast") {
+        logger.info("📨: broadcast dropped", eventCode, message);
+        return;
+    }
     const webhooks = await dbClient.fetchWebhooks(eventCode);
-    webhooks.map(((webhook) => postWebhook(message, webhook)));
+    logger.info(`📨: ${eventCode} to ${webhooks.length} endpoints`);
+    webhooks.map(((webhook) => postWebhook(eventCode, webhook, message)));
 });
 
 const webClient = new WebClient();

@@ -58,7 +58,7 @@ class DbClient {
             logger.error("Error inserting webhook:", err);
             throw new Error(`Error inserting webhook: ${err}`);
         } finally {
-            logger.info("Webhook inserted");
+            logger.info("💾: webhook inserted");
         }
         await client.end();
     }
@@ -75,7 +75,7 @@ class DbClient {
             logger.error("Error removing webhook:", err);
             throw new Error(`Error removing webhook: ${err}`);
         } finally {
-            logger.info("Webhook removed");
+            logger.info("💾: webhook removed");
         }
         await client.end();
     }
@@ -95,15 +95,15 @@ class DbClient {
             logger.error("Error fetching webhooks:", err);
             throw new Error(`Error fetching webhooks: ${err}`);
         } finally {
-            logger.info("All webhooks fetched");
+            logger.info("💾: webhooks fetched");
         }
         await client.end();
         return webhooks;
     }
 
     /**
-     * Fetches webhooks from the database filtered by event_code.
-     * @param {string} eventCode - The event_code to filter webhooks by.
+     * Fetches webhooks from the database filtered by event code.
+     * @param {string} eventCode - The event code to filter webhooks by.
      */
     public async fetchWebhooks(eventCode: string): Promise<Webhook[]> {
         const webhooks: Webhook[] = [];
@@ -117,7 +117,7 @@ class DbClient {
             logger.error("Error fetching webhooks:", err);
             throw new Error(`Error fetching webhooks: ${err}`);
         } finally {
-            logger.info(`Webhooks fetched for ${eventCode}`);
+            logger.info(`💾: fetching ${eventCode} webhooks`);
         }
         await client.end();
         return webhooks;
@@ -150,7 +150,7 @@ class DbClient {
             logger.error("Error recreating webhooks table:", err);
             throw new Error(`Error recreating webhooks table: ${err}`);
         } finally {
-            logger.info("Webhooks table recreated");
+            logger.info("💾: webhooks table recreated");
         }
         await client.end();
     }

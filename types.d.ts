@@ -51,7 +51,7 @@ interface Webhook {
     id: string;
 
     /**
-     * The event_code calling the webhook.
+     * The event code calling the webhook.
      * @memberof Webhook
      * @type {string}
      */

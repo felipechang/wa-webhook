@@ -51,7 +51,7 @@ class WebClient {
      */
     public boot(): void {
         this.app.listen(5000);
-        logger.info("Server started on http://localhost:5000");
+        logger.info("🌐: server started http://localhost:5000");
     }
 
     /**
@@ -65,12 +65,6 @@ class WebClient {
             ];
             for (let i = 0; i < events.length; i++) {
                 switch (events[i]) {
-                    case "auth_failure":
-                        selectOptions.push(`<option value="auth_failure">Auth Failure</option>`);
-                        break;
-                    case "authenticated":
-                        selectOptions.push(`<option value="authenticated">Authenticated</option>`);
-                        break;
                     case "change_battery":
                         selectOptions.push(`<option value="change_battery">Change Battery</option>`);
                         break;
@@ -133,9 +127,6 @@ class WebClient {
                         break;
                     case "chat_archived":
                         selectOptions.push(`<option value="chat_archived">Chat Archived/Unarchived</option>`);
-                        break;
-                    case "loading_screen":
-                        selectOptions.push(`<option value="loading_screen">Loading Screen Appearing</option>`);
                         break;
                     case "call":
                         selectOptions.push(`<option value="call">Call Received</option>`);
@@ -282,11 +273,12 @@ class WebClient {
             }
             try {
                 await dbClient.insertWebhook(webhook);
-                logger.info(`Hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
                 res.json({});
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
             }
         });
     }
@@ -297,14 +289,15 @@ class WebClient {
      */
     public onHookAddComponent(dbClient: DbClient): void {
         this.app.post("/component/webhook-control", async (req: Request<Webhook>, res: Response) => {
+            const webhook = WebClient.makeHook(req.body);
             try {
-                const webhook = WebClient.makeHook(req.body);
                 await dbClient.insertWebhook(webhook);
-                logger.info(`Hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
                 res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
             } catch (error) {
                 logger.error(error);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            } finally {
+                logger.info(`🌐: hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
             }
         });
     }
@@ -350,12 +343,14 @@ class WebClient {
                 return;
             }
             try {
-                logger.info(`Hook removed: id=${req.params.id}`);
                 await dbClient.removeWebhook(req.params.id);
                 res.json({});
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({error: "Internal Server Error"});
+            }
+            finally {
+                logger.info(`🌐: hook removed: id=${req.params.id}`);
             }
         });
     }
@@ -367,12 +362,13 @@ class WebClient {
     public onHookRemoveComponent(dbClient: DbClient): void {
         this.app.delete("/component/webhook-control/:id", async (req: Request<{ id: string }>, res: Response) => {
             try {
-                logger.info(`Hook removed: id=${req.params.id}`);
                 await dbClient.removeWebhook(req.params.id);
                 res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
             } catch (error) {
                 logger.error(error);
                 res.status(500).send(Buffer.from(this.alertComponent("alert-error", "Internal Server Error")));
+            }finally {
+                logger.info(`🌐: hook removed: id=${req.params.id}`);
             }
         });
     }
@@ -396,12 +392,13 @@ class WebClient {
                 return;
             }
             try {
-                logger.info(`Received message from ${req.body.from}: ${req.body.message}`);
                 const sent = await waClient.sendMessage(req.body.from, req.body.message);
                 res.json({sent});
             } catch (error) {
                 logger.error(error);
                 res.status(500).json({error: "Internal Server Error"});
+            } finally {
+                logger.info(`🌐: received message from ${req.body.from}: ${req.body.message}`);
             }
         });
     }
@@ -413,7 +410,7 @@ class WebClient {
     public onIncomingMessageComponent(waClient: WaClient): void {
         this.app.post("/component/message-control", async (req: Request<MessageBody>, res: Response) => {
             try {
-                logger.info(`Received message from ${req.body.from}: ${req.body.message}`);
+                logger.info(`🌐: received message from ${req.body.from}: ${req.body.message}`);
                 const sent = await waClient.sendMessage(req.body.from, req.body.message);
                 res.send(Buffer.from(sent ?
                     this.alertComponent("alert-success", "Message sent") :
