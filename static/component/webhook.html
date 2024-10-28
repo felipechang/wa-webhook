@@ -2,83 +2,93 @@
     <div class="text-3xl mx-auto">Manage Webhooks</div>
 </div>
 <div class="flex flex-row">
-    <div class="basis-1/3 flex flex-col items-center">
+    <div class="w-1/4 flex flex-col items-center">
         <h1 class="text-3xl">Create:</h1>
         <form class="flex flex-col gap-2 items-end" hx-post="/component/webhook-control" hx-target="#webhook-response"
               hx-validate>
-            <label class="form-control w-full max-w-xs" for="eventCode">
+            <label class="form-control w-full max-w-xs" for="event_code">
                 <div class="label">
-                    <span class="label-text">Event Code:</span>
+                    <span class="label-text">Event Code</span>
                 </div>
-                <select class="select select-bordered w-full max-w-xs" id="eventCode" name="eventCode" hx-get="/component/event-options" hx-trigger="load">
+                <select
+                        class="select select-bordered w-full max-w-xs"
+                        id="event_code"
+                        name="event_code"
+                        hx-get="/component/event-options"
+                        hx-trigger="load"
+                        hx-target="#event_code"
+                        hx-swap="outerHTML"
+                >
+                    <option>Loading...</option>
                 </select>
             </label>
-            <label class="form-control w-full max-w-xs" for="postUrl">
+            <label class="form-control w-full max-w-xs" for="post_url">
                 <div class="label">
-                    <span class="label-text">Webhook URL:</span>
+                    <span class="label-text">Webhook URL</span>
                 </div>
-                <input class="checkbox" id="postUrl" minlength="3" name="postUrl" required type="url"/>
+                <input class="input input-bordered w-full max-w-xs" id="post_url" minlength="3" name="post_url" required
+                       type="url"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includeInfo">
+            <label class="form-control flex-row w-full max-w-xs" for="include_info">
+                <input class="checkbox mt-2 mr-1" id="include_info" name="include_info" type="checkbox"/>
                 <div class="label">
-                    <span class="label-text">Include Info:</span>
+                    <span class="label-text">Include Info</span>
                 </div>
-                <input class="checkbox" id="includeInfo" name="includeInfo" type="checkbox"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includeChat">
+            <label class="form-control flex-row w-full max-w-xs" for="include_chat">
+                <input class="checkbox mt-2 mr-1" id="include_chat" name="include_chat" type="checkbox"/>
                 <div class="label">
-                    <span class="label-text">Include Chat:</span>
+                    <span class="label-text">Include Chat</span>
                 </div>
-                <input class="checkbox" id="includeChat" name="includeChat" type="checkbox"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includeContact">
+            <label class="form-control flex-row w-full max-w-xs" for="include_contact">
+                <input class="checkbox mt-2 mr-1" id="include_contact" name="include_contact" type="checkbox"/>
                 <div class="label">
-                    <span class="label-text">Include Contact:</span>
+                    <span class="label-text">Include Contact</span>
                 </div>
-                <input class="checkbox" id="includeContact" name="includeContact" type="checkbox"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includeQuotedMessage">
-                <div class="label">
-                    <span class="label-text">Include Quoted Message:</span>
-                </div>
-                <input class="checkbox" id="includeQuotedMessage" name="includeQuotedMessage"
+            <label class="form-control flex-row w-full max-w-xs" for="include_quoted_message">
+                <input class="checkbox mt-2 mr-1" id="include_quoted_message" name="include_quoted_message"
                        type="checkbox"/>
-            </label>
-            <label class="form-control w-full max-w-xs" for="includeOrder">
                 <div class="label">
-                    <span class="label-text">Include Order:</span>
+                    <span class="label-text">Include Quoted Message</span>
                 </div>
-                <input class="checkbox" id="includeOrder" name="includeOrder" type="checkbox"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includeGroupMentions">
+            <label class="form-control flex-row w-full max-w-xs" for="include_order">
+                <input class="checkbox mt-2 mr-1" id="include_order" name="include_order" type="checkbox"/>
                 <div class="label">
-                    <span class="label-text">Include Group Mentions:</span>
+                    <span class="label-text">Include Order</span>
                 </div>
-                <input class="checkbox" id="includeGroupMentions" name="includeGroupMentions"
+            </label>
+            <label class="form-control flex-row w-full max-w-xs" for="include_group_mentions">
+                <input class="checkbox mt-2 mr-1" id="include_group_mentions" name="include_group_mentions"
                        type="checkbox"/>
-            </label>
-            <label class="form-control w-full max-w-xs" for="includeMentions">
                 <div class="label">
-                    <span class="label-text">Include Mentions:</span>
+                    <span class="label-text">Include Group Mentions</span>
                 </div>
-                <input class="checkbox" id="includeMentions" name="includeMentions" type="checkbox"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includePayment">
+            <label class="form-control flex-row w-full max-w-xs" for="include_mentions">
+                <input class="checkbox mt-2 mr-1" id="include_mentions" name="include_mentions" type="checkbox"/>
                 <div class="label">
-                    <span class="label-text">Include Payment:</span>
+                    <span class="label-text">Include Mentions</span>
                 </div>
-                <input class="checkbox" id="includePayment" name="includePayment" type="checkbox"/>
             </label>
-            <label class="form-control w-full max-w-xs" for="includeReactions">
+            <label class="form-control flex-row w-full max-w-xs" for="include_payment">
+                <input class="checkbox mt-2 mr-1" id="include_payment" name="include_payment" type="checkbox"/>
                 <div class="label">
-                    <span class="label-text">Include Reactions:</span>
+                    <span class="label-text">Include Payment</span>
                 </div>
-                <input class="checkbox" id="includeReactions" name="includeReactions" type="checkbox"/>
+            </label>
+            <label class="form-control flex-row w-full max-w-xs" for="include_reactions">
+                <input class="checkbox mt-2 mr-1" id="include_reactions" name="include_reactions" type="checkbox"/>
+                <div class="label">
+                    <span class="label-text">Include Reactions</span>
+                </div>
             </label>
             <input class="btn btn-primary mt-6 w-full" type="submit" value="Add Hook">
         </form>
     </div>
-    <div class="basis-2/3">
+    <div class="w-3/4">
         <form hx-get="/component/webhook-control" hx-target="#webhook-response" hx-trigger="load">
         </form>
         <div id="webhook-response"></div>

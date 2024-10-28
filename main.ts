@@ -37,8 +37,8 @@ webClient.onIncomingMessageComponent(waClient);
 (async function () {
     // Boot database client
     await dbClient.boot();
-    // Boot WhatsApp client
-    await waClient.boot();
     // Boot web client
     webClient.boot();
+    // Boot WhatsApp client
+    await waClient.boot();
 })();

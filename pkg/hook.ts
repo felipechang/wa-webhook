@@ -8,7 +8,7 @@ import {Message} from "whatsapp-web.js";
  */
 export const postWebhook = async (message: Message, webhook: Webhook): Promise<void> => {
     try {
-        const response = await fetch(webhook.postUrl, {
+        const response = await fetch(webhook.post_url, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             // TODO check response sent
@@ -22,15 +22,15 @@ export const postWebhook = async (message: Message, webhook: Webhook): Promise<v
                 // deviceType: message.deviceType,
                 // hasMedia: message.hasMedia,
                 media: message.hasMedia ? await message.downloadMedia() : null,
-                info: webhook.includeInfo ? await message.getInfo() : null,
-                chat: webhook.includeChat ? await message.getChat() : null,
-                contact: webhook.includeContact ? await message.getContact() : null,
-                quotedMessage: webhook.includeQuotedMessage ? await message.getQuotedMessage() : null,
-                order: webhook.includeOrder ? await message.getOrder() : null,
-                groupMentions: webhook.includeGroupMentions ? await message.getGroupMentions() : null,
-                mentions: webhook.includeMentions ? await message.getMentions() : null,
-                payment: webhook.includePayment ? await message.getPayment() : null,
-                reactions: webhook.includeReactions ? await message.getReactions() : null,
+                info: webhook.include_info ? await message.getInfo() : null,
+                chat: webhook.include_chat ? await message.getChat() : null,
+                contact: webhook.include_contact ? await message.getContact() : null,
+                quotedMessage: webhook.include_quoted_message ? await message.getQuotedMessage() : null,
+                order: webhook.include_order ? await message.getOrder() : null,
+                groupMentions: webhook.include_group_mentions ? await message.getGroupMentions() : null,
+                mentions: webhook.include_mentions ? await message.getMentions() : null,
+                payment: webhook.include_payment ? await message.getPayment() : null,
+                reactions: webhook.include_reactions ? await message.getReactions() : null,
                 ...message.rawData
             }),
         });

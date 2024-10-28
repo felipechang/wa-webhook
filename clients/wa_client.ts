@@ -24,12 +24,19 @@ class WaClient {
     private qr = "";
 
     /**
+     * Client is ready.
+     * @private
+     */
+    private ready = false;
+
+
+    /**
      * Constructor for the WaClient class.
      */
     constructor() {
         this.client = new wa.Client({
             authStrategy: new wa.LocalAuth(),
-            puppeteer: {
+            puppeteer: process.env.NODE_ENV === "development" ? {} : {
                 executablePath: "/usr/bin/google-chrome",
                 args: ["--no-sandbox", "--disable-setuid-sandbox"]
             }
@@ -48,8 +55,8 @@ class WaClient {
 
         this.client.on("ready", async () => {
             this.qr = "";
-            const state = await this.client.getState();
-            logger.info(`WhatsApp client is ready with state ${state}`);
+            this.ready = true;
+            logger.info(`WhatsApp client is ready`);
         });
 
         await this.client.initialize();
@@ -62,8 +69,7 @@ class WaClient {
      * @returns {Promise<ChatContact>} A promise that resolves to the contact with the given ID.
      */
     public async getContactById(contactId: string): Promise<ChatContact> {
-        const state = await this.client.getState();
-        if (state != "CONNECTED") throw new Error("Client is not ready");
+        if (!this.ready) throw new Error("Client is not ready");
         const contact = await this.client.getContactById(contactId);
         return {
             id: contact.id._serialized,
@@ -90,8 +96,7 @@ class WaClient {
 
 
     public async getContacts(): Promise<ChatContact[]> {
-        const state = await this.client.getState();
-        if (state != "CONNECTED") throw new Error("Client is not ready");
+        if (!this.ready) throw new Error("Client is not ready");
         const chats = await this.client.getContacts();
         return chats.map(contact => {
             return {
@@ -124,8 +129,7 @@ class WaClient {
      * @returns {Promise<ChatGroup[]>} A promise that resolves to an array of chat groups.
      */
     public async getGroups(): Promise<ChatGroup[]> {
-        const state = await this.client.getState();
-        if (state != "CONNECTED") throw new Error("Client is not ready");
+        if (!this.ready) throw new Error("Client is not ready");
         const chats = await this.client.getChats();
         return chats
             .filter(chat => chat.isGroup)
@@ -149,10 +153,9 @@ class WaClient {
      * @returns {ReadyStatus} The ready status of the client.
      */
     public async getReadyStatus(): Promise<ReadyStatus> {
-        const state = await this.client.getState();
         return {
             qr: this.qr,
-            ready: state != "CONNECTED"
+            ready: this.ready
         };
     }
 
@@ -173,8 +176,7 @@ class WaClient {
      * @returns {Promise<boolean>}
      */
     public async sendMessage(from: string, message: string): Promise<boolean> {
-        const state = await this.client.getState();
-        if (state != "CONNECTED") throw new Error("Client is not ready");
+        if (!this.ready) throw new Error("Client is not ready");
         await this.client.sendMessage(from, message);
         logger.info("Message sent");
         return true;

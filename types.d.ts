@@ -51,81 +51,81 @@ interface Webhook {
     id: string;
 
     /**
-     * The eventCode calling the webhook.
+     * The event_code calling the webhook.
      * @memberof Webhook
      * @type {string}
      */
-    eventCode: string;
+    event_code: string;
 
     /**
      * The webhook URL.
      * @memberof Webhook
      * @type {string}
      */
-    postUrl: string;
+    post_url: string;
 
     /**
      * Include information about message delivery status
      * @memberof Webhook
      * @type {boolean}
      */
-    includeInfo: boolean;
+    include_info: boolean;
 
     /**
      * Include the Chat this message was sent in
      * @memberof Webhook
      * @type {boolean}
      */
-    includeChat: boolean;
+    include_chat: boolean;
 
     /**
      * Include the Contact this message was sent from
      * @memberof Webhook
      * @type {boolean}
      */
-    includeContact: boolean;
+    include_contact: boolean;
 
     /**
      * Include the quoted message, if any
      * @memberof Webhook
      * @type {boolean}
      */
-    includeQuotedMessage: boolean;
+    include_quoted_message: boolean;
 
     /**
      * Include the order associated with a given message
      * @memberof Webhook
      * @type {boolean}
      */
-    includeOrder: boolean;
+    include_order: boolean;
 
     /**
      * Include groups mentioned in this message
      * @memberof Webhook
      * @type {boolean}
      */
-    includeGroupMentions: boolean;
+    include_group_mentions: boolean;
 
     /**
      * Include the Contacts mentioned in this message
      * @memberof Webhook
      * @type {boolean}
      */
-    includeMentions: boolean;
+    include_mentions: boolean;
 
     /**
      * Include the payment details associated with a given message
      * @memberof Webhook
      * @type {boolean}
      */
-    includePayment: boolean;
+    include_payment: boolean;
 
     /**
      * Include the reactions associated with the given message
      * @memberof Webhook
      * @type {boolean}
      */
-    includeReactions: boolean;
+    include_reactions: boolean;
 }
 
 /**

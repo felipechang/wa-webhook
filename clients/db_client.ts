@@ -25,20 +25,35 @@ class DbClient {
     public async insertWebhook(webhook: Webhook): Promise<void> {
         const client = await this.NewClient();
         try {
-            await client.query(`INSERT INTO webhooks (id, event_code, post_url, include_info, include_chat, include_contact, include_quoted_message, include_order, include_group_mentions, include_mentions, include_payment, include_reactions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, [
-                webhook.id,
-                webhook.eventCode,
-                webhook.postUrl,
-                webhook.includeInfo,
-                webhook.includeChat,
-                webhook.includeContact,
-                webhook.includeQuotedMessage,
-                webhook.includeOrder,
-                webhook.includeGroupMentions,
-                webhook.includeMentions,
-                webhook.includePayment,
-                webhook.includeReactions,
-            ]);
+            await client.query(`
+              INSERT INTO webhooks (
+                event_code,
+                post_url,
+                include_info,
+                include_chat,
+                include_contact,
+                include_quoted_message,
+                include_order,
+                include_group_mentions,
+                include_mentions,
+                include_payment,
+                include_reactions
+              ) VALUES (
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+              )`,
+                [
+                    webhook.event_code,
+                    webhook.post_url,
+                    webhook.include_info,
+                    webhook.include_chat,
+                    webhook.include_contact,
+                    webhook.include_quoted_message,
+                    webhook.include_order,
+                    webhook.include_group_mentions,
+                    webhook.include_mentions,
+                    webhook.include_payment,
+                    webhook.include_reactions,
+                ]);
         } catch (err) {
             logger.error("Error inserting webhook:", err);
             throw new Error(`Error inserting webhook: ${err}`);
@@ -87,8 +102,8 @@ class DbClient {
     }
 
     /**
-     * Fetches webhooks from the database filtered by eventCode.
-     * @param {string} eventCode - The eventCode to filter webhooks by.
+     * Fetches webhooks from the database filtered by event_code.
+     * @param {string} eventCode - The event_code to filter webhooks by.
      */
     public async fetchWebhooks(eventCode: string): Promise<Webhook[]> {
         const webhooks: Webhook[] = [];

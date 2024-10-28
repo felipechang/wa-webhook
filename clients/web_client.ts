@@ -29,20 +29,20 @@ class WebClient {
         this.app.use(express.static("static"))
     }
 
-    private static makeHook(hook: Webhook): Webhook {
+    private static makeHook(hook: any): Webhook {
         return {
             id: hook.id || "",
-            eventCode: hook.eventCode || "",
-            postUrl: hook.postUrl || "",
-            includeChat: hook.includeChat || false,
-            includeContact: hook.includeContact || false,
-            includeGroupMentions: hook.includeGroupMentions || false,
-            includeInfo: hook.includeInfo || false,
-            includeMentions: hook.includeMentions || false,
-            includeOrder: hook.includeOrder || false,
-            includePayment: hook.includePayment || false,
-            includeQuotedMessage: hook.includeQuotedMessage || false,
-            includeReactions: hook.includeReactions || false
+            event_code: hook.event_code || "",
+            post_url: hook.post_url || "",
+            include_chat: hook.include_chat === "on",
+            include_contact: hook.include_contact === "on",
+            include_group_mentions: hook.include_group_mentions === "on",
+            include_info: hook.include_info === "on",
+            include_mentions: hook.include_mentions === "on",
+            include_order: hook.include_order === "on",
+            include_payment: hook.include_payment === "on",
+            include_quoted_message: hook.include_quoted_message === "on",
+            include_reactions: hook.include_reactions === "on"
         }
     }
 
@@ -61,7 +61,7 @@ class WebClient {
         this.app.get("/component/event-options", async (_: Request<Webhook>, res: Response) => {
             const events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
             const selectOptions = [
-                `<select class="select select-bordered w-full max-w-xs" id="eventCode" name="eventCode">`
+                `<select class="select select-bordered w-full max-w-xs" id="event_code" name="event_code">`
             ];
             for (let i = 0; i < events.length; i++) {
                 switch (events[i]) {
@@ -149,7 +149,7 @@ class WebClient {
                 }
             }
             selectOptions.push(`</select>`)
-            res.send(Buffer.from(selectOptions.join()));
+            res.send(Buffer.from(selectOptions.join("")));
         });
     }
 
@@ -272,17 +272,17 @@ class WebClient {
                 return;
             }
             const webhook = WebClient.makeHook(req.body);
-            if (!webhook.eventCode) {
-                res.status(400).json({error: "eventCode is a required parameter"});
+            if (!webhook.event_code) {
+                res.status(400).json({error: "event_code is a required parameter"});
                 return;
             }
-            if (!webhook.postUrl) {
-                res.status(400).json({error: "postUrl is a required parameter"});
+            if (!webhook.post_url) {
+                res.status(400).json({error: "post_url is a required parameter"});
                 return;
             }
             try {
                 await dbClient.insertWebhook(webhook);
-                logger.info(`Hook added: eventCode=${webhook.eventCode}, postUrl=${webhook.postUrl}`);
+                logger.info(`Hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
                 res.json({});
             } catch (error) {
                 logger.error(error);
@@ -300,7 +300,7 @@ class WebClient {
             try {
                 const webhook = WebClient.makeHook(req.body);
                 await dbClient.insertWebhook(webhook);
-                logger.info(`Hook added: eventCode=${webhook.eventCode}, postUrl=${webhook.postUrl}`);
+                logger.info(`Hook added: event_code=${webhook.event_code}, post_url=${webhook.post_url}`);
                 res.send(Buffer.from(this.listComponent(await dbClient.fetchAllWebhooks())));
             } catch (error) {
                 logger.error(error);
@@ -461,18 +461,18 @@ class WebClient {
             `<table class="table">`,
             `<thead>`,
             `<tr>`,
-            `    <th>Event Code</th>`,
-            `    <th>Webhook URL</th>`,
-            `    <th>Include Info</th>`,
-            `    <th>Include Chat</th>`,
-            `    <th>Include Contact</th>`,
-            `    <th>Include Quoted Message</th>`,
-            `    <th>Include Order</th>`,
-            `    <th>Include Group Mentions</th>`,
-            `    <th>Include Mentions</th>`,
-            `    <th>Include Payment</th>`,
-            `    <th>Include Reactions</th>`,
-            `    <th>Remove</th>`,
+            `    <th>Event</th>`,
+            `    <th>URL</th>`,
+            `    <th>➕ Info</th>`,
+            `    <th>➕ Chat</th>`,
+            `    <th>➕ Contact</th>`,
+            `    <th>➕ Quoted Message</th>`,
+            `    <th>➕ Order</th>`,
+            `    <th>➕ Group Mentions</th>`,
+            `    <th>➕ Mentions</th>`,
+            `    <th>➕ Payment</th>`,
+            `    <th>➕ Reactions</th>`,
+            `    <th></th>`,
             `<tr>`,
             `</thead>`,
             `<tbody>`,
@@ -482,17 +482,17 @@ class WebClient {
             const webhook = webhooks[i];
             nodes.push(`
         <tr>
-          <td>${webhook.eventCode}</td>
-          <td>${webhook.postUrl}</td>
-          <td>${webhook.includeInfo ? "✅" : "🚫"}</td>
-          <td>${webhook.includeChat ? "✅" : "🚫"}</td>
-          <td>${webhook.includeContact ? "✅" : "🚫"}</td>
-          <td>${webhook.includeQuotedMessage ? "✅" : "🚫"}</td>
-          <td>${webhook.includeOrder ? "✅" : "🚫"}</td>
-          <td>${webhook.includeGroupMentions ? "✅" : "🚫"}</td>
-          <td>${webhook.includeMentions ? "✅" : "🚫"}</td>
-          <td>${webhook.includePayment ? "✅" : "🚫"}</td>
-          <td>${webhook.includeReactions ? "✅" : "🚫"}</td>
+          <td>${webhook.event_code}</td>
+          <td>${webhook.post_url}</td>
+          <td>${webhook.include_info ? "✅" : "🚫"}</td>
+          <td>${webhook.include_chat ? "✅" : "🚫"}</td>
+          <td>${webhook.include_contact ? "✅" : "🚫"}</td>
+          <td>${webhook.include_quoted_message ? "✅" : "🚫"}</td>
+          <td>${webhook.include_order ? "✅" : "🚫"}</td>
+          <td>${webhook.include_group_mentions ? "✅" : "🚫"}</td>
+          <td>${webhook.include_mentions ? "✅" : "🚫"}</td>
+          <td>${webhook.include_payment ? "✅" : "🚫"}</td>
+          <td>${webhook.include_reactions ? "✅" : "🚫"}</td>
           <td>
             <button hx-delete="/component/webhook-control/${webhook.id}" hx-target="#webhook-response">
                💀

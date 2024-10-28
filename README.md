@@ -43,18 +43,18 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 - `POST /api/webhook`
     - Creates a new webhook subscription
     - Required body parameters:
-        - `eventCode`: Type of event to subscribe to
-        - `postUrl`: URL where webhook notifications will be sent
+        - `event_code`: Type of event to subscribe to
+        - `post_url`: URL where webhook notifications will be sent
     - Optional body parameters:
-        - `includeChat`: Include chat information (boolean)
-        - `includeContact`: Include contact information (boolean)
-        - `includeGroupMentions`: Include group mentions (boolean)
-        - `includeInfo`: Include additional info (boolean)
-        - `includeMentions`: Include mentions (boolean)
-        - `includeOrder`: Include order information (boolean)
-        - `includePayment`: Include payment information (boolean)
-        - `includeQuotedMessage`: Include quoted messages (boolean)
-        - `includeReactions`: Include message reactions (boolean)
+        - `include_chat`: Include chat information (boolean)
+        - `include_contact`: Include contact information (boolean)
+        - `include_group_mentions`: Include group mentions (boolean)
+        - `include_info`: Include additional info (boolean)
+        - `include_mentions`: Include mentions (boolean)
+        - `include_order`: Include order information (boolean)
+        - `include_payment`: Include payment information (boolean)
+        - `include_quoted_message`: Include quoted messages (boolean)
+        - `include_reactions`: Include message reactions (boolean)
 
 - `GET /api/webhook`
     - Returns a list of all registered webhooks

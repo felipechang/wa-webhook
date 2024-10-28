@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx main.ts"
+    "start": "tsx main.ts",
+    "start:dev": "cross-env NODE_ENV=development tsx main.ts"
   },
   "dependencies": {
     "body-parser": "^1.20.3",
@@ -21,6 +22,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.6",
     "@types/pg": "^8.11.10",
-    "@types/qrcode": "^1.5.5"
+    "@types/qrcode": "^1.5.5",
+    "cross-env": "^7.0.3"
   }
 }
