@@ -1,7 +1,7 @@
 # WhatsApp Webhooks
 
-Integrate WhatsApp messaging capabilities into your applications through webhooks and
-REST APIs.
+Not meant to be a complete communication solution but a "setup and leave" integration between WhatsApp and other applications (like n8n.io) through webhooks and
+REST APIs. Best suited for self-hosted environments and personal use.
 
 > [!IMPORTANT]
 > **Uses [whatsapp-web.js](https://github.com/pedroslopez/whatsapp-web.js), so it's not guaranteed you won't be blocked
