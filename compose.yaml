@@ -11,6 +11,8 @@ services:
       WA_WEBHOOK_API_AUTH: ${WA_WEBHOOK_API_AUTH}
     volumes:
       - sessions:/app/sessions
+      - storage:/app/storage
 
 volumes:
   sessions:
+  storage:
