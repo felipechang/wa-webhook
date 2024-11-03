@@ -74,7 +74,7 @@ not allow bots or unofficial clients on their platform, so this shouldn't be con
 
 **Authentication**
 
-All API endpoints can optionally require the `X-Api-Key` header by setting the `WA_WEBHOOK_API_AUTH` environment
+All API endpoints can optionally require the `x-api-key` header by setting the `WA_WEBHOOK_API_AUTH` environment
 variable. When left bank authentication is disabled.
 
 All endpoints return JSON responses and include appropriate error handling. Error responses will include a status code
@@ -89,7 +89,7 @@ and an error message in the following format:
 Common HTTP status codes:
 
 - 200: Successful operation
-- 401: Invalid or missing X-Api-Key
+- 401: Invalid or missing x-api-key
 - 400: Bad request (missing or invalid parameters)
 - 500: Internal server error
 

@@ -614,10 +614,10 @@ class WebClient {
     private validateHeaderKey(req: Request<any>): string {
         const sysKey = process.env.WA_WEBHOOK_API_AUTH;
         if (!sysKey) return "";
-        if (!req.headers || !req.headers['X-API-Key']) {
+        if (!req.headers || !req.headers['x-api-key']) {
             return "Missing API key header";
         }
-        const headerKey = req.headers['X-API-Key'];
+        const headerKey = req.headers['x-api-key'];
         const apiKey = typeof headerKey === "string" ? headerKey : headerKey[0];
         if (!apiKey) {
             return "Missing API key";
