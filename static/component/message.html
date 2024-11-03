@@ -1,0 +1,40 @@
+<div class="flex flex-row mb-10">
+    <div class="text-3xl mx-auto">Test sending a Message</div>
+</div>
+
+<div class="flex">
+    <div class="mx-auto">
+        <form class="flex flex-col gap-2 w-80" hx-post="/component/message-control" hx-target="#message-response"
+              hx-validate>
+            <label class="form-control w-full max-w-xs" for="recipient">
+                <div class="label">
+                    <span class="label-text">Recipient:</span>
+                </div>
+                <select
+                        class="select select-bordered w-full max-w-xs"
+                        id="recipient"
+                        name="recipient"
+                        hx-get="/component/contact"
+                        hx-trigger="load"
+                        hx-target="#recipient"
+                        hx-swap="outerHTML"
+                >
+                    <option>Loading...</option>
+                </select>
+            </label>
+            <label class="form-control w-full max-w-xs" for="message">
+                <div class="label">
+                    <span class="label-text">Message:</span>
+                </div>
+                <textarea id="message" minlength="3" name="message" required
+                          class="textarea textarea-bordered"></textarea>
+            </label>
+            <div class="grid pt-4 pl-2 pr-2 justify-items-center">
+                <input class="btn btn-primary w-full" type="submit" value="Send">
+            </div>
+        </form>
+        <div class="pt-10" id="message-response">
+
+        </div>
+    </div>
+</div>

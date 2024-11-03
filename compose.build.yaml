@@ -1,0 +1,16 @@
+services:
+
+  app:
+    build: .
+    container_name: wa-webhook-app
+    restart: unless-stopped
+    ports:
+      - "${WA_WEBHOOK_PORT}:5000"
+    environment:
+      WA_WEBHOOK_EVENTS: ${WA_WEBHOOK_EVENTS}
+      WA_WEBHOOK_API_AUTH: ${WA_WEBHOOK_API_AUTH}
+    volumes:
+      - sessions:/app/sessions
+
+volumes:
+  sessions:

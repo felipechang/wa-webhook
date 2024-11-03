@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WhatsApp Webhooks</title>
+    <link href="/assets/daisyui.css" rel="stylesheet" type="text/css"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script src="/assets/tailwind.js"></script>
+</head>
+<body>
+<div class="min-h-full">
+    <nav class="bg-gray-800">
+        <div class="navbar bg-base-100">
+            <div class="navbar-center hidden lg:flex">
+                <div class="tabs" role="tablist">
+                    <a class="tab" role="tab">
+                        <form hx-get="/component/status.html" hx-target="#tab-content">
+                            <input class="cursor-pointer" type="submit" value="Status">
+                        </form>
+                    </a>
+                    <a class="tab" role="tab">
+                        <form hx-get="/component/message.html" hx-target="#tab-content">
+                            <input class="cursor-pointer" type="submit" value="Messages">
+                        </form>
+                    </a>
+                    <a class="tab" role="tab">
+                        <form hx-get="/component/webhook.html" hx-target="#tab-content">
+                            <input class="cursor-pointer" type="submit" value="Webhooks">
+                        </form>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <div class="flex flex-col" hx-get="/component/status.html" hx-trigger="load" id="tab-content">
+        </div>
+    </main>
+</div>
+<script src="/assets/htmx.min.js"></script>
+</body>
+</html>

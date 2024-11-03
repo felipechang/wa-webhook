@@ -1,0 +1,6 @@
+.idea
+.env
+.wwebjs_cache
+node_modules
+package-lock.json
+/storage/database.sqlite
