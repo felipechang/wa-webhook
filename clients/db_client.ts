@@ -26,6 +26,7 @@ class DbClient {
             await db.run(`
               INSERT INTO webhooks (
                 event_code,
+                sender,
                 post_url,
                 auth_header,
                 include_info,
@@ -37,9 +38,10 @@ class DbClient {
                 include_mentions,
                 include_payment,
                 include_reactions
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     webhook.event_code,
+                    webhook.sender || "",
                     webhook.post_url,
                     webhook.auth_header,
                     webhook.include_info ? 1 : 0,
@@ -52,7 +54,7 @@ class DbClient {
                     webhook.include_payment ? 1 : 0,
                     webhook.include_reactions ? 1 : 0,
                 ]);
-            logger.info(`💾: webhook with event_code=${webhook.event_code}, post_url=${webhook.post_url} inserted into database`);
+            logger.info(`💾: webhook with event_code=${webhook.event_code}, post_url=${webhook.post_url.trim()} inserted into database`);
         } catch (err) {
             throw new Error(`💾: error inserting webhook: ${err}`);
         }
@@ -126,6 +128,7 @@ class DbClient {
             CREATE TABLE IF NOT EXISTS webhooks (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 event_code TEXT,
+                sender TEXT,
                 post_url TEXT,
                 auth_header TEXT,
                 include_info INTEGER DEFAULT 0,

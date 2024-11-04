@@ -9,6 +9,10 @@ import {logger} from "./logger.js";
  * @returns {Promise<void>}
  */
 export const postWebhook = async (eventCode: string, webhook: Webhook, message: Message | undefined): Promise<void> => {
+    if (!process.env.WA_WEBHOOK_BREAK_CHAR) return;
+    if (!message) return;
+    if (message.body.indexOf(process.env.WA_WEBHOOK_BREAK_CHAR) === 0) return;
+    if (process.env.WA_WEBHOOK_BREAK_CHAR === message?.body[0]) return;
     try {
         const headers: { [key: string]: string } = {"Content-Type": "application/json"};
         webhook.auth_header.split(",").map((e) => {
@@ -38,7 +42,9 @@ export const postWebhook = async (eventCode: string, webhook: Webhook, message: 
         if (!response.ok) {
             const {code, message, hint} = await response.json() as any;
             logger.error(`🌐: issue posting webhook: code=${code} message=${message} hint=${hint}`);
+            return;
         }
+        logger.info(`🌐: posted webhook`);
     } catch (error: any) {
         logger.error(`🌐: error posting webhook: ${error?.message}`);
     }

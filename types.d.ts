@@ -58,6 +58,13 @@ interface Webhook {
     event_code: string;
 
     /**
+     * The phone numbered to be matched (optional).
+     * @memberof Webhook
+     * @type {string}
+     */
+    sender: string;
+
+    /**
      * Comma separated list of webhook request headers (Basic c2VjcmV0Cg==,Foo Bar).
      * @memberof Webhook
      * @type {string}

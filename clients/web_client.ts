@@ -33,6 +33,7 @@ class WebClient {
         return {
             id: hook.id || "",
             event_code: hook.event_code || "",
+            sender: hook.sender || "",
             auth_header: hook.auth_header || "",
             post_url: hook.post_url || "",
             include_chat: hook.include_chat === "on",
@@ -59,7 +60,7 @@ class WebClient {
      * Returns a list of event options for the WhatsApp Webhook.
      */
     public onEventOptionsComponent(): void {
-        this.app.get("/component/event-options", async (_: Request<Webhook>, res: Response) => {
+        this.app.get("/component/event-options", async (_: Request, res: Response) => {
             try {
                 const events = (process.env.WA_WEBHOOK_EVENTS || "").split(",");
                 const selectOptions = [
@@ -194,8 +195,8 @@ class WebClient {
                 return;
             }
             try {
-                const contact = await waClient.getContacts();
-                res.json(contact);
+                const contacts = await waClient.getContacts();
+                res.json(contacts);
             } catch (error: any) {
                 logger.error(`🌐: error fetching contacts: ${error?.message}`);
                 res.status(500).json({error: "Internal Server Error"});
@@ -211,10 +212,14 @@ class WebClient {
      * @param waClient The WhatsApp client.
      */
     public onGetContactsComponent(waClient: WaClient): void {
-        this.app.get("/component/contact", async (_: Request, res: Response) => {
+        this.app.get("/component/contact/:type", async (req: Request, res: Response) => {
+            if (!req.params || !req.params.type) {
+                res.status(400).json({error: "Parameter type is missing"});
+                return;
+            }
             try {
-                const contact = await waClient.getContacts();
-                const contactOptions = contact.map((c) => {
+                const contacts = await waClient.getContacts();
+                const contactOptions = contacts.map((c) => {
                     return {
                         name: c.verifiedName || c.name || c.pushname,
                         value: c.id,
@@ -226,7 +231,7 @@ class WebClient {
                     return 0;
                 });
                 const selectOptions = [
-                    `<select class="select select-bordered w-full max-w-xs" id="recipient" name="recipient" required>`
+                    `<select class="select select-bordered w-full max-w-xs" id="${req.params.type}" name="${req.params.type}" required>`
                 ];
                 for (let i = 0; i < contactOptions.length; i++) {
                     selectOptions.push(`<option value="${contactOptions[i].value}" ${contactOptions[i].selected ? "selected" : ""}>${contactOptions[i].name}</option>`);
@@ -490,8 +495,13 @@ class WebClient {
                 res.status(400).json({error: "message is a required parameter"});
                 return;
             }
+            if (req.body.message.indexOf(process.env.WA_WEBHOOK_BREAK_CHAR) === 0) {
+                res.status(400).json({error: "break character found"});
+                return;
+            }
+
             try {
-                await waClient.sendMessage(req.body.recipient, req.body.message);
+                await waClient.sendMessage(req.body.recipient, `${process.env.WA_WEBHOOK_BREAK_CHAR} ${req.body.message}`);
                 res.json({});
             } catch (error: any) {
                 logger.error(`🌐: error relaying message: ${error?.message}`);
@@ -553,19 +563,20 @@ class WebClient {
     private listWebhooksComponent(webhooks: Webhook[]): string {
         const nodes = [
             `<div class="overflow-x-auto">`,
-            `<table class="table">`,
+            `<table class="table table-sm">`,
             `<thead>`,
             `<tr>`,
             `    <th></th>`,
             `    <th>Event</th>`,
+            `    <th>Sender</th>`,
             `    <th>URL</th>`,
             `    <th>Header</th>`,
             `    <th>➕ Info</th>`,
             `    <th>➕ Chat</th>`,
             `    <th>➕ Contact</th>`,
-            `    <th>➕ Quoted Message</th>`,
+            `    <th>➕ QM</th>`,
             `    <th>➕ Order</th>`,
-            `    <th>➕ Group Mentions</th>`,
+            `    <th>➕ GM</th>`,
             `    <th>➕ Mentions</th>`,
             `    <th>➕ Payment</th>`,
             `    <th>➕ Reactions</th>`,
@@ -584,6 +595,7 @@ class WebClient {
             </button>
           </td>
           <td>${webhook.event_code}</td>
+          <td>${webhook.sender}</td>
           <td>${webhook.post_url}</td>
           <td>${webhook.auth_header}</td>
           <td>${webhook.include_info ? "✅" : "🚫"}</td>
@@ -613,7 +625,6 @@ class WebClient {
      */
     private validateHeaderKey(req: Request<any>): string {
         const sysKey = process.env.WA_WEBHOOK_API_AUTH;
-        if (!sysKey) return "";
         if (!req.headers || !req.headers['x-api-key']) {
             return "Missing API key header";
         }

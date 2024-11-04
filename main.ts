@@ -8,6 +8,10 @@ import {postWebhook} from "./pkg/hook.ts";
 import {Message} from "whatsapp-web.js";
 import {logger} from "./pkg/logger.js";
 
+if (!process.env.WA_WEBHOOK_BREAK_CHAR) throw new Error("WA_WEBHOOK_BREAK_CHAR environment variable missing");
+if (!process.env.WA_WEBHOOK_EVENTS) throw new Error("WA_WEBHOOK_EVENTS environment variable missing");
+if (!process.env.WA_WEBHOOK_API_AUTH) throw new Error("WA_WEBHOOK_API_AUTH environment variable missing");
+
 const dbClient = new DbClient();
 const waClient = new WaClient();
 
@@ -19,7 +23,13 @@ waClient.onOutgoingListeners(async (eventCode, message: Message) => {
     }
     const webhooks = await dbClient.fetchWebhooks(eventCode);
     logger.info(`📨: ${eventCode} to ${webhooks.length} endpoints`);
-    webhooks.map(((webhook) => postWebhook(eventCode, webhook, message)));
+    webhooks.map(((webhook) => {
+        if (webhook.sender && webhook.sender != message.from) {
+            logger.info(`📨: ${eventCode} ${message.from} is not the sender`);
+            return;
+        }
+        postWebhook(eventCode, webhook, message);
+    }));
 });
 
 const webClient = new WebClient();

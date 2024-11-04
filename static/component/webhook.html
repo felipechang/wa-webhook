@@ -21,6 +21,22 @@
                     <option>Loading...</option>
                 </select>
             </label>
+            <label class="form-control w-full max-w-xs" for="sender">
+                <div class="label">
+                    <span class="label-text">Sender (Optional)</span>
+                </div>
+                <select
+                        class="select select-bordered w-full max-w-xs"
+                        id="sender"
+                        name="sender"
+                        hx-get="/component/contact/sender"
+                        hx-trigger="load"
+                        hx-target="#sender"
+                        hx-swap="outerHTML"
+                >
+                    <option>Loading...</option>
+                </select>
+            </label>
             <label class="form-control w-full max-w-xs" for="post_url">
                 <div class="label">
                     <span class="label-text">Webhook URL</span>
